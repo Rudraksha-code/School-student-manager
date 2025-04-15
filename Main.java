@@ -1,4 +1,3 @@
-import java.io.*;
 import java.util.*;
 
 public class Main {
@@ -91,22 +90,18 @@ public class Main {
         coursePeriods.add(3);
 
         // Load teacher details from Teachers.txt
-        try (BufferedReader br = new BufferedReader(new FileReader("School-student-manager/Teachers.txt"))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] parts = line.split(", ");
-                String id = parts[0].split(": ")[1];
-                String name = parts[1].split(": ")[1];
-                String dob = parts[2].split(": ")[1];
-                String[] courses = parts[3].split(": ")[1].split(", ");
+        List<String> teacherLines = Utils.readLinesFromFile("School-student-manager/Teachers.txt");
+        for (String line : teacherLines) {
+            String[] parts = line.split(", ");
+            String id = parts[0].split(": ")[1];
+            String name = parts[1].split(": ")[1];
+            String dob = parts[2].split(": ")[1];
+            String[] courses = parts[3].split(": ")[1].split(", ");
 
-                teacherIds.add(id);
-                teacherNames.add(name);
-                teacherDobs.add(dob);
-                teacherCourses.add(new ArrayList<>(Arrays.asList(courses)));
-            }
-        } catch (IOException e) {
-            System.out.println("Error loading teachers: " + e.getMessage());
+            teacherIds.add(id);
+            teacherNames.add(name);
+            teacherDobs.add(dob);
+            teacherCourses.add(new ArrayList<>(Arrays.asList(courses)));
         }
 
         // Map teachers to courses
@@ -126,27 +121,23 @@ public class Main {
     }
 
     static void loadStudents() {
-        try (BufferedReader br = new BufferedReader(new FileReader("School-student-manager/StudentProfile.txt"))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] parts = line.split(", ", 5);
-                if (parts.length < 5) {
-                    System.out.println("Invalid student data: " + line);
-                    continue;
-                }
-
-                studentIds.add(parts[0].split(": ")[1]);
-                studentNames.add(parts[1].split(": ")[1]);
-                studentDobs.add(parts[2].split(": ")[1]);
-
-                ArrayList<Integer> marks = parseDetails(parts[3].split(": ")[1]);
-                ArrayList<Integer> attendance = parseDetails(parts[4].split(": ")[1]);
-
-                studentMarks.add(marks);
-                studentAttendance.add(attendance);
+        List<String> studentLines = Utils.readLinesFromFile("School-student-manager/StudentProfile.txt");
+        for (String line : studentLines) {
+            String[] parts = line.split(", ", 5);
+            if (parts.length < 5) {
+                System.out.println("Invalid student data: " + line);
+                continue;
             }
-        } catch (IOException e) {
-            System.out.println("Error loading students: " + e.getMessage());
+
+            studentIds.add(parts[0].split(": ")[1]);
+            studentNames.add(parts[1].split(": ")[1]);
+            studentDobs.add(parts[2].split(": ")[1]);
+
+            ArrayList<Integer> marks = parseDetails(parts[3].split(": ")[1]);
+            ArrayList<Integer> attendance = parseDetails(parts[4].split(": ")[1]);
+
+            studentMarks.add(marks);
+            studentAttendance.add(attendance);
         }
     }
 
@@ -169,29 +160,26 @@ public class Main {
     }
 
     static void saveStudents() {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter("School-student-manager/StudentProfile.txt"))) {
-            for (int i = 0; i < studentIds.size(); i++) {
-                StringBuilder sb = new StringBuilder();
-                sb.append("ID: ").append(studentIds.get(i)).append(", ");
-                sb.append("Name: ").append(studentNames.get(i)).append(", ");
-                sb.append("DOB: ").append(studentDobs.get(i)).append(", ");
-                sb.append("Marks: {");
-                for (int j = 0; j < courseNames.size(); j++) {
-                    sb.append(courseNames.get(j)).append("=").append(studentMarks.get(i).get(j));
-                    if (j < courseNames.size() - 1) sb.append(", ");
-                }
-                sb.append("}, Attendance: {");
-                for (int j = 0; j < courseNames.size(); j++) {
-                    sb.append(courseNames.get(j)).append("=").append(studentAttendance.get(i).get(j));
-                    if (j < courseNames.size() - 1) sb.append(", ");
-                }
-                sb.append("}");
-                bw.write(sb.toString());
-                bw.newLine();
+        List<String> studentLines = new ArrayList<>();
+        for (int i = 0; i < studentIds.size(); i++) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("ID: ").append(studentIds.get(i)).append(", ");
+            sb.append("Name: ").append(studentNames.get(i)).append(", ");
+            sb.append("DOB: ").append(studentDobs.get(i)).append(", ");
+            sb.append("Marks: {");
+            for (int j = 0; j < courseNames.size(); j++) {
+                sb.append(courseNames.get(j)).append("=").append(studentMarks.get(i).get(j));
+                if (j < courseNames.size() - 1) sb.append(", ");
             }
-        } catch (IOException e) {
-            System.out.println("Error saving students: " + e.getMessage());
+            sb.append("}, Attendance: {");
+            for (int j = 0; j < courseNames.size(); j++) {
+                sb.append(courseNames.get(j)).append("=").append(studentAttendance.get(i).get(j));
+                if (j < courseNames.size() - 1) sb.append(", ");
+            }
+            sb.append("}");
+            studentLines.add(sb.toString());
         }
+        Utils.writeLinesToFile("School-student-manager/StudentProfile.txt", studentLines);
     }
 
     static void addStudent(Scanner scanner) {
