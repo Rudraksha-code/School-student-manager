@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.*;
 
 public class Main {
@@ -14,7 +15,7 @@ public class Main {
 
     static CourseManager courseManager;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         initializeTeachers();
         initializeCourses();
         loadStudents();
@@ -62,7 +63,7 @@ public class Main {
         courseManager = new CourseManager(courses);
     }
 
-    static void initializeTeachers() {
+    static void initializeTeachers() throws IOException {
         List<String> teacherLines = Utils.readLinesFromFile("School-student-manager/Teachers.txt");
         for (String line : teacherLines) {
             String[] parts = line.split(", ");
@@ -78,7 +79,7 @@ public class Main {
         }
     }
 
-    static void loadStudents() {
+    static void loadStudents() throws IOException {
         List<String> studentLines = Utils.readLinesFromFile("School-student-manager/StudentProfile.txt");
         for (String line : studentLines) {
             String[] parts = line.split(", ", 5);
@@ -117,7 +118,7 @@ public class Main {
         return values;
     }
 
-    static void saveStudents() {
+    static void saveStudents() throws IOException {
         List<String> studentLines = new ArrayList<>();
         for (int i = 0; i < studentIds.size(); i++) {
             StringBuilder sb = new StringBuilder();

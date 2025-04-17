@@ -4,27 +4,24 @@ import java.util.List;
 
 public class Utils {
 
-    static List<String> readLinesFromFile(String filePath) {
+    static List<String> readLinesFromFile(String filePath) throws IOException {
         List<String> lines = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                lines.add(line);
-            }
-        } catch (IOException e) {
-            System.out.println("Error reading file: " + e.getMessage());
+        BufferedReader br = new BufferedReader(new FileReader(filePath));
+        String line;
+
+        while ((line = br.readLine()) != null) {
+            lines.add(line);
         }
+        br.close();
         return lines;
     }
 
-    static void writeLinesToFile(String filePath, List<String> lines) {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) {
-            for (String line : lines) {
-                bw.write(line);
-                bw.newLine();
-            }
-        } catch (IOException e) {
-            System.out.println("Error writing to file: " + e.getMessage());
+    static void writeLinesToFile(String filePath, List<String> lines) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new FileWriter(filePath));
+        for (String line : lines) {
+            bw.write(line);
+            bw.newLine();
         }
+        bw.close();
     }
 }
