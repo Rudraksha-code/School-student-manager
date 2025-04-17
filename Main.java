@@ -6,17 +6,16 @@ public class Main {
     static ArrayList<String> studentDobs = new ArrayList<>();
     static ArrayList<ArrayList<Integer>> studentMarks = new ArrayList<>();
     static ArrayList<ArrayList<Integer>> studentAttendance = new ArrayList<>();
-    static ArrayList<String> courseNames = new ArrayList<>();
-    static ArrayList<Integer> courseSemesters = new ArrayList<>();
-    static ArrayList<Integer> coursePeriods = new ArrayList<>();
-    static ArrayList<String> teachers = new ArrayList<>();
 
     static ArrayList<String> teacherIds = new ArrayList<>();
     static ArrayList<String> teacherNames = new ArrayList<>();
     static ArrayList<String> teacherDobs = new ArrayList<>();
     static ArrayList<ArrayList<String>> teacherCourses = new ArrayList<>();
 
+    static CourseManager courseManager;
+
     public static void main(String[] args) {
+        initializeTeachers();
         initializeCourses();
         loadStudents();
 
@@ -46,11 +45,11 @@ public class Main {
                 case 2 -> removeStudent(scanner);
                 case 3 -> changeStudentDetails(scanner);
                 case 4 -> showStudentDetails(scanner);
-                case 5 -> showCourseDetails();
+                case 5 -> showCourseDetails(scanner);
                 case 6 -> {
                     saveStudents();
                     System.out.println("Exiting...");
-                    scanner.close(); // Close the scanner here
+                    scanner.close();
                     return;
                 }
                 default -> System.out.println("Invalid option. Please choose a number between 1 and 6.");
@@ -59,37 +58,11 @@ public class Main {
     }
 
     static void initializeCourses() {
-        courseNames.add("Math");
-        courseNames.add("Civics");
-        courseNames.add("History");
-        courseNames.add("English");
-        courseNames.add("Physics");
-        courseNames.add("Chemistry");
-        courseNames.add("Biology");
-        courseNames.add("French");
-        courseNames.add("Computer Science");
+        ArrayList<Course> courses = Course.initializeCourses(teacherNames, teacherCourses);
+        courseManager = new CourseManager(courses);
+    }
 
-        courseSemesters.add(1);
-        courseSemesters.add(1);
-        courseSemesters.add(1);
-        courseSemesters.add(1);
-        courseSemesters.add(2);
-        courseSemesters.add(2);
-        courseSemesters.add(2);
-        courseSemesters.add(1);
-        courseSemesters.add(2);
-
-        coursePeriods.add(1);
-        coursePeriods.add(2);
-        coursePeriods.add(3);
-        coursePeriods.add(4);
-        coursePeriods.add(2);
-        coursePeriods.add(3);
-        coursePeriods.add(4);
-        coursePeriods.add(1);
-        coursePeriods.add(3);
-
-        // Load teacher details from Teachers.txt
+    static void initializeTeachers() {
         List<String> teacherLines = Utils.readLinesFromFile("School-student-manager/Teachers.txt");
         for (String line : teacherLines) {
             String[] parts = line.split(", ");
@@ -102,21 +75,6 @@ public class Main {
             teacherNames.add(name);
             teacherDobs.add(dob);
             teacherCourses.add(new ArrayList<>(Arrays.asList(courses)));
-        }
-
-        // Map teachers to courses
-        for (String course : courseNames) {
-            boolean teacherFound = false;
-            for (int i = 0; i < teacherCourses.size(); i++) {
-                if (teacherCourses.get(i).contains(course)) {
-                    teachers.add(teacherNames.get(i));
-                    teacherFound = true;
-                    break;
-                }
-            }
-            if (!teacherFound) {
-                teachers.add("Unknown"); // Default teacher name if no teacher is found
-            }
         }
     }
 
@@ -142,7 +100,7 @@ public class Main {
     }
 
     static ArrayList<Integer> parseDetails(String details) {
-        ArrayList<Integer> values = new ArrayList<>(Collections.nCopies(courseNames.size(), 0));
+        ArrayList<Integer> values = new ArrayList<>(Collections.nCopies(courseManager.getCourses().size(), 0));
         details = details.replace("{", "").replace("}", "").trim();
         String[] entries = details.split(", ");
         for (String entry : entries) {
@@ -150,7 +108,7 @@ public class Main {
             if (keyValue.length == 2) {
                 String courseName = keyValue[0].trim();
                 int value = Integer.parseInt(keyValue[1].trim());
-                int index = courseNames.indexOf(courseName);
+                int index = courseManager.getCourseIndex(courseName);
                 if (index != -1) {
                     values.set(index, value);
                 }
@@ -167,19 +125,31 @@ public class Main {
             sb.append("Name: ").append(studentNames.get(i)).append(", ");
             sb.append("DOB: ").append(studentDobs.get(i)).append(", ");
             sb.append("Marks: {");
-            for (int j = 0; j < courseNames.size(); j++) {
-                sb.append(courseNames.get(j)).append("=").append(studentMarks.get(i).get(j));
-                if (j < courseNames.size() - 1) sb.append(", ");
+            for (int j = 0; j < courseManager.getCourses().size(); j++) {
+                sb.append(courseManager.getCourses().get(j).getName()).append("=").append(studentMarks.get(i).get(j));
+                if (j < courseManager.getCourses().size() - 1) sb.append(", ");
             }
             sb.append("}, Attendance: {");
-            for (int j = 0; j < courseNames.size(); j++) {
-                sb.append(courseNames.get(j)).append("=").append(studentAttendance.get(i).get(j));
-                if (j < courseNames.size() - 1) sb.append(", ");
+            for (int j = 0; j < courseManager.getCourses().size(); j++) {
+                sb.append(courseManager.getCourses().get(j).getName()).append("=").append(studentAttendance.get(i).get(j));
+                if (j < courseManager.getCourses().size() - 1) sb.append(", ");
             }
             sb.append("}");
             studentLines.add(sb.toString());
         }
         Utils.writeLinesToFile("School-student-manager/StudentProfile.txt", studentLines);
+    }
+
+    static void showCourseDetails(Scanner scanner) {
+        courseManager.showCourseDetails(studentIds, studentNames, studentMarks, studentAttendance);
+
+        System.out.print("\nWould you like to view the teacher's details for a specific course? (yes/no): ");
+        String response = scanner.nextLine().trim().toLowerCase();
+        if (response.equals("yes")) {
+            System.out.print("Enter the name of the course: ");
+            String courseName = scanner.nextLine().trim();
+            showTeacherDetails(courseName);
+        }
     }
 
     static void addStudent(Scanner scanner) {
@@ -195,13 +165,14 @@ public class Main {
         String dob = scanner.nextLine();
 
         // Initialize marks and attendance with -1 for all courses (indicating not enrolled)
-        ArrayList<Integer> marks = new ArrayList<>(Collections.nCopies(courseNames.size(), -1));
-        ArrayList<Integer> attendance = new ArrayList<>(Collections.nCopies(courseNames.size(), -1));
+        ArrayList<Integer> marks = new ArrayList<>(Collections.nCopies(courseManager.getCourses().size(), -1));
+        ArrayList<Integer> attendance = new ArrayList<>(Collections.nCopies(courseManager.getCourses().size(), -1));
 
         // Display available courses
         System.out.println("Available courses:");
-        for (int i = 0; i < courseNames.size(); i++) {
-            System.out.println((i + 1) + ". " + courseNames.get(i) + " (Semester: " + courseSemesters.get(i) + ", Period: " + coursePeriods.get(i) + ")");
+        for (int i = 0; i < courseManager.getCourses().size(); i++) {
+            Course course = courseManager.getCourses().get(i);
+            System.out.println((i + 1) + ". " + course.getName() + " (Semester: " + course.getSemester() + ", Period: " + course.getPeriod() + ")");
         }
 
         // Prompt the user to select courses
@@ -217,18 +188,17 @@ public class Main {
         for (String courseIndexStr : selectedCourses) {
             try {
                 int courseIndex = Integer.parseInt(courseIndexStr.trim()) - 1;
-                if (courseIndex >= 0 && courseIndex < courseNames.size()) {
-                    int period = coursePeriods.get(courseIndex);
-                    int semester = courseSemesters.get(courseIndex);
-                    String periodSemesterPair = period + "-" + semester;
+                if (courseIndex >= 0 && courseIndex < courseManager.getCourses().size()) {
+                    Course course = courseManager.getCourses().get(courseIndex);
+                    String periodSemesterPair = course.getPeriod() + "-" + course.getSemester();
 
                     if (selectedPeriodSemesterPairs.contains(periodSemesterPair)) {
-                        conflictCourses.add(courseNames.get(courseIndex) + " (Semester " + semester + ", Period " + period + ")");
+                        conflictCourses.add(course.getName() + " (Semester " + course.getSemester() + ", Period " + course.getPeriod() + ")");
                     } else {
                         marks.set(courseIndex, 0); // Initialize marks to 0
                         attendance.set(courseIndex, 0); // Initialize attendance to 0
                         selectedPeriodSemesterPairs.add(periodSemesterPair); // Mark this period-semester pair as occupied
-                        enrolledCourses.add(courseNames.get(courseIndex) + " (Semester " + semester + ", Period " + period + ")");
+                        enrolledCourses.add(course.getName() + " (Semester " + course.getSemester() + ", Period " + course.getPeriod() + ")");
                     }
                 } else {
                     System.out.println("Invalid course number: " + (courseIndex + 1));
@@ -291,9 +261,9 @@ public class Main {
         // Display only the courses the student is enrolled in
         System.out.println("Enrolled Courses:");
         ArrayList<Integer> enrolledCourses = new ArrayList<>();
-        for (int i = 0; i < courseNames.size(); i++) {
+        for (int i = 0; i < courseManager.getCourses().size(); i++) {
             if (studentMarks.get(index).get(i) != -1 && studentAttendance.get(index).get(i) != -1) {
-                System.out.println((enrolledCourses.size() + 1) + ". " + courseNames.get(i));
+                System.out.println((enrolledCourses.size() + 1) + ". " + courseManager.getCourses().get(i).getName());
                 enrolledCourses.add(i); // Store the index of the enrolled course
             }
         }
@@ -345,41 +315,13 @@ public class Main {
         System.out.println("Name: " + studentNames.get(index));
         System.out.println("DOB: " + studentDobs.get(index));
         System.out.println("Enrolled Courses:");
-        for (int i = 0; i < courseNames.size(); i++) {
+        for (int i = 0; i < courseManager.getCourses().size(); i++) {
             // Only show courses the student is enrolled in
             if (studentMarks.get(index).get(i) != -1 && studentAttendance.get(index).get(i) != -1) {
-                System.out.println("Course: " + courseNames.get(i));
+                System.out.println("Course: " + courseManager.getCourses().get(i).getName());
                 System.out.println("    Marks: " + studentMarks.get(index).get(i));
                 System.out.println("    Attendance: " + studentAttendance.get(index).get(i));
             }
-        }
-    }
-
-    static void showCourseDetails() {
-        Scanner scanner = new Scanner(System.in);
-
-        // Display all course details
-        for (int i = 0; i < courseNames.size(); i++) {
-            System.out.println("Course: " + courseNames.get(i));
-            System.out.println("  Teacher: " + (i < teachers.size() ? teachers.get(i) : "Unknown"));
-            System.out.println("  Semester: " + courseSemesters.get(i));
-            System.out.println("  Period: " + coursePeriods.get(i));
-            System.out.println("  Students:");
-            for (int j = 0; j < studentIds.size(); j++) {
-                // Check if the student is enrolled in the course (marks or attendance not -1)
-                if (studentMarks.get(j).get(i) != -1 && studentAttendance.get(j).get(i) != -1) {
-                    System.out.println("    - " + studentNames.get(j) + " (ID: " + studentIds.get(j) + ")");
-                }
-            }
-            System.out.println();
-        }
-
-        // Ask the user which teacher's details they want to view
-        System.out.print("Enter the name of the course to view the teacher's details (or type 'none' to skip): ");
-        String courseName = scanner.nextLine().trim();
-
-        if (!courseName.equalsIgnoreCase("none")) {
-            showTeacherDetails(courseName);
         }
     }
 
@@ -390,7 +332,7 @@ public class Main {
                 System.out.println("  ID: " + teacherIds.get(i));
                 System.out.println("  Name: " + teacherNames.get(i));
                 System.out.println("  DOB: " + teacherDobs.get(i));
-                System.out.println("  Courses: " + String.join(", ", teacherCourses.get(i)));
+                System.out.println("  Courses: " + String.join(", ", teacherCourses.get(i))); // This should already display all courses
                 return;
             }
         }
