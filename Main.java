@@ -43,7 +43,7 @@ public class Main {
                 case 4 -> studentRecords.showStudentDetails(scanner);
                 case 5 -> showCourseDetails(scanner);
                 case 6 -> {
-                    saveStudents();
+                    studentEnrollment.saveStudents("School-student-manager/StudentProfile.txt");
                     System.out.println("Exiting...");
                     scanner.close();
                     return;
@@ -78,31 +78,6 @@ public class Main {
 
             teachers.add(new Teacher(id, name, dob, courses));
         }
-    }
-
-    static void saveStudents() throws IOException {
-        List<String> studentLines = new ArrayList<>();
-
-        for (Student student : students) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("ID: ").append(student.getId()).append(", ");
-            sb.append("Name: ").append(student.getName()).append(", ");
-            sb.append("DOB: ").append(student.getDob()).append(", ");
-            sb.append("Marks: {");
-            
-            for (int j = 0; j < courseManager.getCourses().size(); j++) {
-                sb.append(courseManager.getCourses().get(j).getName()).append("=").append(student.getMarks().get(j));
-                if (j < courseManager.getCourses().size() - 1) sb.append(", ");
-            }
-            sb.append("}, Attendance: {");
-            for (int j = 0; j < courseManager.getCourses().size(); j++) {
-                sb.append(courseManager.getCourses().get(j).getName()).append("=").append(student.getAttendance().get(j));
-                if (j < courseManager.getCourses().size() - 1) sb.append(", ");
-            }
-            sb.append("}");
-            studentLines.add(sb.toString());
-        }
-        Utils.writeLinesToFile("School-student-manager/StudentProfile.txt", studentLines);
     }
 
     static void showCourseDetails(Scanner scanner) {

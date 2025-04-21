@@ -1,4 +1,7 @@
 import java.util.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class StudentEnrollment {
     private ArrayList<Student> students;
@@ -89,7 +92,40 @@ public class StudentEnrollment {
     public void removeStudent(Scanner scanner) {
         System.out.print("Enter Student ID to remove: ");
         String id = scanner.nextLine();
-        students.removeIf(student -> student.getId().equals(id));
-        System.out.println("Student removed successfully.");
+
+        // Check if a student with the given ID exists
+        boolean removed = students.removeIf(student -> student.getId().equals(id));
+
+        if (removed) {
+            System.out.println("Student removed successfully.");
+        } 
+        else {
+            System.out.println("Student not found.");
+        }
+    }
+
+    public void saveStudents(String filePath) throws IOException {
+        List<String> studentLines = new ArrayList<>();
+
+        for (Student student : students) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("ID: ").append(student.getId()).append(", ");
+            sb.append("Name: ").append(student.getName()).append(", ");
+            sb.append("DOB: ").append(student.getDob()).append(", ");
+            sb.append("Marks: {");
+
+            for (int j = 0; j < courseManager.getCourses().size(); j++) {
+                sb.append(courseManager.getCourses().get(j).getName()).append("=").append(student.getMarks().get(j));
+                if (j < courseManager.getCourses().size() - 1) sb.append(", ");
+            }
+            sb.append("}, Attendance: {");
+            for (int j = 0; j < courseManager.getCourses().size(); j++) {
+                sb.append(courseManager.getCourses().get(j).getName()).append("=").append(student.getAttendance().get(j));
+                if (j < courseManager.getCourses().size() - 1) sb.append(", ");
+            }
+            sb.append("}");
+            studentLines.add(sb.toString());
+        }
+        Utils.writeLinesToFile(filePath, studentLines);
     }
 }
