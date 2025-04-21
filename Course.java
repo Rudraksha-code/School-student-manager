@@ -12,6 +12,7 @@ class Course {
         this.semester = semester;
         this.period = period;
     }
+    
     public static ArrayList<Course> initializeCourses(ArrayList<String> teacherNames, ArrayList<ArrayList<String>> teacherCourses) {
         ArrayList<Course> courses = new ArrayList<>();
         int semester = 1; // Start with semester 1
