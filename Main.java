@@ -3,14 +3,17 @@ import java.util.*;
 
 public class Main {
     static ArrayList<Student> students = new ArrayList<>();
-    static ArrayList<Teacher> teachers = new ArrayList<>();
+
+    static TeacherManager teacherManager = new TeacherManager();
     static CourseManager courseManager;
     static StudentRecords studentRecords;
     static StudentEnrollment studentEnrollment;
 
     public static void main(String[] args) throws IOException {
-        initializeTeachers();
+        teacherManager.initializeTeachers("School-student-manager/Teachers.txt");
+
         initializeCourses();
+        
         students = Student.loadStudents("School-student-manager/StudentProfile.txt", courseManager);
         studentRecords = new StudentRecords(students, courseManager);
         studentEnrollment = new StudentEnrollment(students, courseManager);
@@ -57,7 +60,7 @@ public class Main {
         ArrayList<String> teacherNames = new ArrayList<>();
         ArrayList<ArrayList<String>> teacherCourses = new ArrayList<>();
 
-        for (Teacher teacher : teachers) {
+        for (Teacher teacher : teacherManager.getTeachers()) {
             teacherNames.add(teacher.getName());
             teacherCourses.add(teacher.getCourses());
         }
@@ -66,41 +69,28 @@ public class Main {
         courseManager = new CourseManager(courses);
     }
 
-    static void initializeTeachers() throws IOException {
-        List<String> teacherLines = Utils.readLinesFromFile("School-student-manager/Teachers.txt");
-        for (String line : teacherLines) {
-            String[] parts = line.split(", ", 4); // Split into 4 parts: ID, Name, DOB, and Courses
-            String id = parts[0].split(": ")[1];
-            String name = parts[1].split(": ")[1];
-            String dob = parts[2].split(": ")[1];
-            String[] coursesArray = parts[3].split(": ")[1].split(", "); // Correctly split courses by ", "
-            ArrayList<String> courses = new ArrayList<>(Arrays.asList(coursesArray));
-
-            teachers.add(new Teacher(id, name, dob, courses));
-        }
-    }
-
     static void showCourseDetails(Scanner scanner) {
         ArrayList<String> studentIds = new ArrayList<>();
         ArrayList<String> studentNames = new ArrayList<>();
         ArrayList<ArrayList<Integer>> studentMarks = new ArrayList<>();
         ArrayList<ArrayList<Integer>> studentAttendance = new ArrayList<>();
-
+    
         for (Student student : students) {
             studentIds.add(student.getId());
             studentNames.add(student.getName());
             studentMarks.add(student.getMarks());
             studentAttendance.add(student.getAttendance());
         }
-
+    
         courseManager.showCourseDetails(studentIds, studentNames, studentMarks, studentAttendance);
-
+    
         System.out.print("\nWould you like to view the teacher's details for a specific course? (yes/no): ");
         String response = scanner.nextLine().trim().toLowerCase();
         if (response.equals("yes")) {
             System.out.print("Enter the name of the course: ");
             String courseName = scanner.nextLine().trim();
-            Teacher.showTeacherDetails(teachers, courseName); // Call the method in Teacher class
+            // Pass the courses list to the showTeacherDetails method
+            Teacher.showTeacherDetails(teacherManager.getTeachers(), courseManager.getCourses(), courseName);
         }
     }
 }

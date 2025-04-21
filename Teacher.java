@@ -17,25 +17,30 @@ class Teacher extends Person {
     }
 
     // Static method to show teacher details for a specific course
-    public static void showTeacherDetails(ArrayList<Teacher> teachers, String courseName) {
-        boolean teacherFound = false;
-
-        for (Teacher teacher : teachers) {
-            if (teacher.getCourses().contains(courseName)) {
-                if (!teacherFound) {
-                    System.out.println("Teacher Details:");
-                    teacherFound = true;
-                }
-                System.out.println("  ID: " + teacher.getId());
-                System.out.println("  Name: " + teacher.getName());
-                System.out.println("  DOB: " + teacher.getDob());
-                System.out.println("  Courses: " + String.join(", ", teacher.getCourses())); // Display all courses
-                System.out.println(); // Add a blank line for better readability
+    public static void showTeacherDetails(ArrayList<Teacher> teachers, ArrayList<Course> courses, String courseName) {
+        // First find the teacher assigned to teach this course in the system
+        String assignedTeacherName = null;
+        for (Course course : courses) {
+            if (course.getName().equals(courseName)) {
+                assignedTeacherName = course.getTeacher();
+                break;
             }
         }
-
-        if (!teacherFound) {
-            System.out.println("No teacher found for this course.");
+        
+        if (assignedTeacherName != null) {
+            // Find the teacher by name
+            for (Teacher teacher : teachers) {
+                if (teacher.getName().equals(assignedTeacherName)) {
+                    System.out.println("Teacher Details:");
+                    System.out.println("  ID: " + teacher.getId());
+                    System.out.println("  Name: " + teacher.getName());
+                    System.out.println("  DOB: " + teacher.getDob());
+                    System.out.println("  Courses: " + String.join(", ", teacher.getCourses()));
+                    return;
+                }
+            }
         }
+        
+        System.out.println("No teacher found for this course.");
     }
 }
