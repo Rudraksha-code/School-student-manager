@@ -11,7 +11,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         initializeTeachers();
         initializeCourses();
-        loadStudents();
+        students = Student.loadStudents("School-student-manager/StudentProfile.txt", courseManager);
         studentRecords = new StudentRecords(students, courseManager);
         studentEnrollment = new StudentEnrollment(students, courseManager);
 
@@ -78,44 +78,6 @@ public class Main {
 
             teachers.add(new Teacher(id, name, dob, courses));
         }
-    }
-
-    static void loadStudents() throws IOException {
-        List<String> studentLines = Utils.readLinesFromFile("School-student-manager/StudentProfile.txt");
-        for (String line : studentLines) {
-            String[] parts = line.split(", ", 5);
-            if (parts.length < 5) {
-                System.out.println("Invalid student data: " + line);
-                continue;
-            }
-
-            String id = parts[0].split(": ")[1];
-            String name = parts[1].split(": ")[1];
-            String dob = parts[2].split(": ")[1];
-
-            ArrayList<Integer> marks = parseDetails(parts[3].split(": ")[1]);
-            ArrayList<Integer> attendance = parseDetails(parts[4].split(": ")[1]);
-
-            students.add(new Student(id, name, dob, marks, attendance));
-        }
-    }
-
-    static ArrayList<Integer> parseDetails(String details) {
-        ArrayList<Integer> values = new ArrayList<>(Collections.nCopies(courseManager.getCourses().size(), 0));
-        details = details.replace("{", "").replace("}", "").trim();
-        String[] entries = details.split(", ");
-        for (String entry : entries) {
-            String[] keyValue = entry.split("=");
-            if (keyValue.length == 2) {
-                String courseName = keyValue[0].trim();
-                int value = Integer.parseInt(keyValue[1].trim());
-                int index = courseManager.getCourseIndex(courseName);
-                if (index != -1) {
-                    values.set(index, value);
-                }
-            }
-        }
-        return values;
     }
 
     static void saveStudents() throws IOException {

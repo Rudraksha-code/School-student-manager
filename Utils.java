@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Utils {
@@ -23,5 +24,23 @@ public class Utils {
             bw.newLine();
         }
         bw.close();
+    }
+
+    static ArrayList<Integer> parseDetails(String details, CourseManager courseManager) {
+        ArrayList<Integer> values = new ArrayList<>(Collections.nCopies(courseManager.getCourses().size(), 0));
+        details = details.replace("{", "").replace("}", "").trim();
+        String[] entries = details.split(", ");
+        for (String entry : entries) {
+            String[] keyValue = entry.split("=");
+            if (keyValue.length == 2) {
+                String courseName = keyValue[0].trim();
+                int value = Integer.parseInt(keyValue[1].trim());
+                int index = courseManager.getCourseIndex(courseName);
+                if (index != -1) {
+                    values.set(index, value);
+                }
+            }
+        }
+        return values;
     }
 }
