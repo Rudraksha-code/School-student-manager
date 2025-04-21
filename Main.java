@@ -2,19 +2,10 @@ import java.io.IOException;
 import java.util.*;
 
 public class Main {
-    static ArrayList<String> studentIds = new ArrayList<>();
-    static ArrayList<String> studentNames = new ArrayList<>();
-    static ArrayList<String> studentDobs = new ArrayList<>();
-    static ArrayList<ArrayList<Integer>> studentMarks = new ArrayList<>();
-    static ArrayList<ArrayList<Integer>> studentAttendance = new ArrayList<>();
-
-    static ArrayList<String> teacherIds = new ArrayList<>();
-    static ArrayList<String> teacherNames = new ArrayList<>();
-    static ArrayList<String> teacherDobs = new ArrayList<>();
-    static ArrayList<ArrayList<String>> teacherCourses = new ArrayList<>();
+    static ArrayList<Student> students = new ArrayList<>();
+    static ArrayList<Teacher> teachers = new ArrayList<>();
 
     static CourseManager courseManager;
-
     public static void main(String[] args) throws IOException {
         initializeTeachers();
         initializeCourses();
@@ -59,6 +50,14 @@ public class Main {
     }
 
     static void initializeCourses() {
+        ArrayList<String> teacherNames = new ArrayList<>();
+        ArrayList<ArrayList<String>> teacherCourses = new ArrayList<>();
+
+        for (Teacher teacher : teachers) {
+            teacherNames.add(teacher.getName());
+            teacherCourses.add(teacher.getCourses());
+        }
+
         ArrayList<Course> courses = Course.initializeCourses(teacherNames, teacherCourses);
         courseManager = new CourseManager(courses);
     }
@@ -70,12 +69,10 @@ public class Main {
             String id = parts[0].split(": ")[1];
             String name = parts[1].split(": ")[1];
             String dob = parts[2].split(": ")[1];
-            String[] courses = parts[3].split(": ")[1].split(", ");
+            String[] coursesArray = parts[3].split(": ")[1].split(", ");
+            ArrayList<String> courses = new ArrayList<>(Arrays.asList(coursesArray));
 
-            teacherIds.add(id);
-            teacherNames.add(name);
-            teacherDobs.add(dob);
-            teacherCourses.add(new ArrayList<>(Arrays.asList(courses)));
+            teachers.add(new Teacher(id, name, dob, courses));
         }
     }
 
@@ -88,15 +85,14 @@ public class Main {
                 continue;
             }
 
-            studentIds.add(parts[0].split(": ")[1]);
-            studentNames.add(parts[1].split(": ")[1]);
-            studentDobs.add(parts[2].split(": ")[1]);
+            String id = parts[0].split(": ")[1];
+            String name = parts[1].split(": ")[1];
+            String dob = parts[2].split(": ")[1];
 
             ArrayList<Integer> marks = parseDetails(parts[3].split(": ")[1]);
             ArrayList<Integer> attendance = parseDetails(parts[4].split(": ")[1]);
 
-            studentMarks.add(marks);
-            studentAttendance.add(attendance);
+            students.add(new Student(id, name, dob, marks, attendance));
         }
     }
 
@@ -120,19 +116,21 @@ public class Main {
 
     static void saveStudents() throws IOException {
         List<String> studentLines = new ArrayList<>();
-        for (int i = 0; i < studentIds.size(); i++) {
+
+        for (Student student : students) {
             StringBuilder sb = new StringBuilder();
-            sb.append("ID: ").append(studentIds.get(i)).append(", ");
-            sb.append("Name: ").append(studentNames.get(i)).append(", ");
-            sb.append("DOB: ").append(studentDobs.get(i)).append(", ");
+            sb.append("ID: ").append(student.getId()).append(", ");
+            sb.append("Name: ").append(student.getName()).append(", ");
+            sb.append("DOB: ").append(student.getDob()).append(", ");
             sb.append("Marks: {");
+            
             for (int j = 0; j < courseManager.getCourses().size(); j++) {
-                sb.append(courseManager.getCourses().get(j).getName()).append("=").append(studentMarks.get(i).get(j));
+                sb.append(courseManager.getCourses().get(j).getName()).append("=").append(student.getMarks().get(j));
                 if (j < courseManager.getCourses().size() - 1) sb.append(", ");
             }
             sb.append("}, Attendance: {");
             for (int j = 0; j < courseManager.getCourses().size(); j++) {
-                sb.append(courseManager.getCourses().get(j).getName()).append("=").append(studentAttendance.get(i).get(j));
+                sb.append(courseManager.getCourses().get(j).getName()).append("=").append(student.getAttendance().get(j));
                 if (j < courseManager.getCourses().size() - 1) sb.append(", ");
             }
             sb.append("}");
@@ -142,6 +140,18 @@ public class Main {
     }
 
     static void showCourseDetails(Scanner scanner) {
+        ArrayList<String> studentIds = new ArrayList<>();
+        ArrayList<String> studentNames = new ArrayList<>();
+        ArrayList<ArrayList<Integer>> studentMarks = new ArrayList<>();
+        ArrayList<ArrayList<Integer>> studentAttendance = new ArrayList<>();
+
+        for (Student student : students) {
+            studentIds.add(student.getId());
+            studentNames.add(student.getName());
+            studentMarks.add(student.getMarks());
+            studentAttendance.add(student.getAttendance());
+        }
+
         courseManager.showCourseDetails(studentIds, studentNames, studentMarks, studentAttendance);
 
         System.out.print("\nWould you like to view the teacher's details for a specific course? (yes/no): ");
@@ -158,7 +168,7 @@ public class Main {
         String name = scanner.nextLine();
         System.out.print("Enter ID: ");
         String id = scanner.nextLine();
-        if (studentIds.contains(id)) {
+        if (students.stream().anyMatch(student -> student.getId().equals(id))) {
             System.out.println("Student ID already exists.");
             return;
         }
@@ -209,12 +219,8 @@ public class Main {
             }
         }
 
-        // Add student details to the lists
-        studentIds.add(id);
-        studentNames.add(name);
-        studentDobs.add(dob);
-        studentMarks.add(marks);
-        studentAttendance.add(attendance);
+        // Add student details to the list
+        students.add(new Student(id, name, dob, marks, attendance));
 
         // Display summary of enrollment
         System.out.println("\nEnrollment Summary:");
@@ -237,24 +243,15 @@ public class Main {
     static void removeStudent(Scanner scanner) {
         System.out.print("Enter Student ID to remove: ");
         String id = scanner.nextLine();
-        int index = studentIds.indexOf(id);
-        if (index != -1) {
-            studentIds.remove(index);
-            studentNames.remove(index);
-            studentDobs.remove(index);
-            studentMarks.remove(index);
-            studentAttendance.remove(index);
-            System.out.println("Student removed successfully.");
-        } else {
-            System.out.println("Student not found.");
-        }
+        students.removeIf(student -> student.getId().equals(id));
+        System.out.println("Student removed successfully.");
     }
 
     static void changeStudentDetails(Scanner scanner) {
         System.out.print("Enter Student ID: ");
         String id = scanner.nextLine();
-        int index = studentIds.indexOf(id);
-        if (index == -1) {
+        Student student = students.stream().filter(s -> s.getId().equals(id)).findFirst().orElse(null);
+        if (student == null) {
             System.out.println("Student not found.");
             return;
         }
@@ -263,7 +260,7 @@ public class Main {
         System.out.println("Enrolled Courses:");
         ArrayList<Integer> enrolledCourses = new ArrayList<>();
         for (int i = 0; i < courseManager.getCourses().size(); i++) {
-            if (studentMarks.get(index).get(i) != -1 && studentAttendance.get(index).get(i) != -1) {
+            if (student.getMarks().get(i) != -1 && student.getAttendance().get(i) != -1) {
                 System.out.println((enrolledCourses.size() + 1) + ". " + courseManager.getCourses().get(i).getName());
                 enrolledCourses.add(i); // Store the index of the enrolled course
             }
@@ -297,8 +294,8 @@ public class Main {
         int attendance = scanner.nextInt();
         scanner.nextLine(); // Consume newline
 
-        studentMarks.get(index).set(courseIndex, marks);
-        studentAttendance.get(index).set(courseIndex, attendance);
+        student.getMarks().set(courseIndex, marks);
+        student.getAttendance().set(courseIndex, attendance);
 
         System.out.println("Student details updated successfully.");
     }
@@ -306,34 +303,34 @@ public class Main {
     static void showStudentDetails(Scanner scanner) {
         System.out.print("Enter Student ID: ");
         String id = scanner.nextLine();
-        int index = studentIds.indexOf(id);
-        if (index == -1) {
+        Student student = students.stream().filter(s -> s.getId().equals(id)).findFirst().orElse(null);
+        if (student == null) {
             System.out.println("Student not found.");
             return;
         }
 
-        System.out.println("ID: " + studentIds.get(index));
-        System.out.println("Name: " + studentNames.get(index));
-        System.out.println("DOB: " + studentDobs.get(index));
+        System.out.println("ID: " + student.getId());
+        System.out.println("Name: " + student.getName());
+        System.out.println("DOB: " + student.getDob());
         System.out.println("Enrolled Courses:");
         for (int i = 0; i < courseManager.getCourses().size(); i++) {
             // Only show courses the student is enrolled in
-            if (studentMarks.get(index).get(i) != -1 && studentAttendance.get(index).get(i) != -1) {
+            if (student.getMarks().get(i) != -1 && student.getAttendance().get(i) != -1) {
                 System.out.println("Course: " + courseManager.getCourses().get(i).getName());
-                System.out.println("    Marks: " + studentMarks.get(index).get(i));
-                System.out.println("    Attendance: " + studentAttendance.get(index).get(i));
+                System.out.println("    Marks: " + student.getMarks().get(i));
+                System.out.println("    Attendance: " + student.getAttendance().get(i));
             }
         }
     }
 
     static void showTeacherDetails(String courseName) {
-        for (int i = 0; i < teacherNames.size(); i++) {
-            if (teacherCourses.get(i).contains(courseName)) {
+        for (Teacher teacher : teachers) {
+            if (teacher.getCourses().contains(courseName)) {
                 System.out.println("Teacher Details:");
-                System.out.println("  ID: " + teacherIds.get(i));
-                System.out.println("  Name: " + teacherNames.get(i));
-                System.out.println("  DOB: " + teacherDobs.get(i));
-                System.out.println("  Courses: " + String.join(", ", teacherCourses.get(i))); // This should already display all courses
+                System.out.println("  ID: " + teacher.getId());
+                System.out.println("  Name: " + teacher.getName());
+                System.out.println("  DOB: " + teacher.getDob());
+                System.out.println("  Courses: " + String.join(", ", teacher.getCourses()));
                 return;
             }
         }
