@@ -15,12 +15,22 @@ public class StudentEnrollment {
     public void addStudent(Scanner scanner) {
         System.out.print("Enter name: ");
         String name = scanner.nextLine();
+
         System.out.print("Enter ID: ");
         String id = scanner.nextLine();
-        if (students.stream().anyMatch(student -> student.getId().equals(id))) {
+
+        // Extract student IDs into a separate list
+        ArrayList<String> studentIds = new ArrayList<>();
+        for (Student student : students) {
+            studentIds.add(student.getId());
+        }
+
+        // Check if the ID already exists
+        if (studentIds.contains(id)) {
             System.out.println("Student ID already exists.");
             return;
         }
+
         System.out.print("Enter Date of Birth (YYYY-MM-DD): ");
         String dob = scanner.nextLine();
 
@@ -39,8 +49,6 @@ public class StudentEnrollment {
         System.out.print("Enter the numbers of the courses you want to enroll in (comma-separated): ");
         String[] selectedCourses = scanner.nextLine().split(",");
 
-        // Track selected periods and semesters to prevent conflicts
-        HashSet<String> selectedPeriodSemesterPairs = new HashSet<>();
         ArrayList<String> enrolledCourses = new ArrayList<>();
         ArrayList<String> conflictCourses = new ArrayList<>();
 
@@ -50,15 +58,24 @@ public class StudentEnrollment {
                 int courseIndex = Integer.parseInt(courseIndexStr.trim()) - 1;
                 if (courseIndex >= 0 && courseIndex < courseManager.getCourses().size()) {
                     Course course = courseManager.getCourses().get(courseIndex);
-                    String periodSemesterPair = course.getPeriod() + "-" + course.getSemester();
+                    int period = course.getPeriod();
+                    int semester = course.getSemester();
 
-                    if (selectedPeriodSemesterPairs.contains(periodSemesterPair)) {
-                        conflictCourses.add(course.getName() + " (Semester " + course.getSemester() + ", Period " + course.getPeriod() + ")");
+                    // Check for conflicts
+                    boolean conflict = false;
+                    for (String enrolledCourse : enrolledCourses) {
+                        if (enrolledCourse.contains("Semester " + semester) && enrolledCourse.contains("Period " + period)) {
+                            conflict = true;
+                            break;
+                        }
+                    }
+
+                    if (conflict) {
+                        conflictCourses.add(course.getName() + " (Semester " + semester + ", Period " + period + ")");
                     } else {
                         marks.set(courseIndex, 0); // Initialize marks to 0
                         attendance.set(courseIndex, 0); // Initialize attendance to 0
-                        selectedPeriodSemesterPairs.add(periodSemesterPair); // Mark this period-semester pair as occupied
-                        enrolledCourses.add(course.getName() + " (Semester " + course.getSemester() + ", Period " + course.getPeriod() + ")");
+                        enrolledCourses.add(course.getName() + " (Semester " + semester + ", Period " + period + ")");
                     }
                 } else {
                     System.out.println("Invalid course number: " + (courseIndex + 1));

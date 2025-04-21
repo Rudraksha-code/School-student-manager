@@ -69,11 +69,11 @@ public class Main {
     static void initializeTeachers() throws IOException {
         List<String> teacherLines = Utils.readLinesFromFile("School-student-manager/Teachers.txt");
         for (String line : teacherLines) {
-            String[] parts = line.split(", ");
+            String[] parts = line.split(", ", 4); // Split into 4 parts: ID, Name, DOB, and Courses
             String id = parts[0].split(": ")[1];
             String name = parts[1].split(": ")[1];
             String dob = parts[2].split(": ")[1];
-            String[] coursesArray = parts[3].split(": ")[1].split(", ");
+            String[] coursesArray = parts[3].split(": ")[1].split(", "); // Correctly split courses by ", "
             ArrayList<String> courses = new ArrayList<>(Arrays.asList(coursesArray));
 
             teachers.add(new Teacher(id, name, dob, courses));
@@ -100,21 +100,7 @@ public class Main {
         if (response.equals("yes")) {
             System.out.print("Enter the name of the course: ");
             String courseName = scanner.nextLine().trim();
-            showTeacherDetails(courseName);
+            Teacher.showTeacherDetails(teachers, courseName); // Call the method in Teacher class
         }
-    }
-
-    static void showTeacherDetails(String courseName) {
-        for (Teacher teacher : teachers) {
-            if (teacher.getCourses().contains(courseName)) {
-                System.out.println("Teacher Details:");
-                System.out.println("  ID: " + teacher.getId());
-                System.out.println("  Name: " + teacher.getName());
-                System.out.println("  DOB: " + teacher.getDob());
-                System.out.println("  Courses: " + String.join(", ", teacher.getCourses()));
-                return;
-            }
-        }
-        System.out.println("No teacher found for this course.");
     }
 }
