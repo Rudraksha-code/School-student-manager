@@ -4,12 +4,14 @@ import java.util.*;
 public class Main {
     static ArrayList<Student> students = new ArrayList<>();
     static ArrayList<Teacher> teachers = new ArrayList<>();
-
     static CourseManager courseManager;
+    static StudentRecords studentRecords;
+
     public static void main(String[] args) throws IOException {
         initializeTeachers();
         initializeCourses();
         loadStudents();
+        studentRecords = new StudentRecords(students, courseManager);
 
         Scanner scanner = new Scanner(System.in);
         while (true) {
@@ -35,8 +37,8 @@ public class Main {
             switch (choice) {
                 case 1 -> addStudent(scanner);
                 case 2 -> removeStudent(scanner);
-                case 3 -> changeStudentDetails(scanner);
-                case 4 -> showStudentDetails(scanner);
+                case 3 -> studentRecords.changeStudentDetails(scanner);
+                case 4 -> studentRecords.showStudentDetails(scanner);
                 case 5 -> showCourseDetails(scanner);
                 case 6 -> {
                     saveStudents();
@@ -245,82 +247,6 @@ public class Main {
         String id = scanner.nextLine();
         students.removeIf(student -> student.getId().equals(id));
         System.out.println("Student removed successfully.");
-    }
-
-    static void changeStudentDetails(Scanner scanner) {
-        System.out.print("Enter Student ID: ");
-        String id = scanner.nextLine();
-        Student student = students.stream().filter(s -> s.getId().equals(id)).findFirst().orElse(null);
-        if (student == null) {
-            System.out.println("Student not found.");
-            return;
-        }
-
-        // Display only the courses the student is enrolled in
-        System.out.println("Enrolled Courses:");
-        ArrayList<Integer> enrolledCourses = new ArrayList<>();
-        for (int i = 0; i < courseManager.getCourses().size(); i++) {
-            if (student.getMarks().get(i) != -1 && student.getAttendance().get(i) != -1) {
-                System.out.println((enrolledCourses.size() + 1) + ". " + courseManager.getCourses().get(i).getName());
-                enrolledCourses.add(i); // Store the index of the enrolled course
-            }
-        }
-
-        if (enrolledCourses.isEmpty()) {
-            System.out.println("The student is not enrolled in any courses.");
-            return;
-        }
-
-        System.out.print("Enter the number of the course to update: ");
-        int courseChoice;
-        try {
-            courseChoice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
-            if (courseChoice < 1 || courseChoice > enrolledCourses.size()) {
-                System.out.println("Invalid course number.");
-                return;
-            }
-        } catch (InputMismatchException e) {
-            System.out.println("Invalid input. Please enter a number.");
-            scanner.nextLine(); // Consume invalid input
-            return;
-        }
-
-        int courseIndex = enrolledCourses.get(courseChoice - 1); // Get the actual course index
-
-        System.out.print("Enter new marks: ");
-        int marks = scanner.nextInt();
-        System.out.print("Enter new attendance: ");
-        int attendance = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
-
-        student.getMarks().set(courseIndex, marks);
-        student.getAttendance().set(courseIndex, attendance);
-
-        System.out.println("Student details updated successfully.");
-    }
-
-    static void showStudentDetails(Scanner scanner) {
-        System.out.print("Enter Student ID: ");
-        String id = scanner.nextLine();
-        Student student = students.stream().filter(s -> s.getId().equals(id)).findFirst().orElse(null);
-        if (student == null) {
-            System.out.println("Student not found.");
-            return;
-        }
-
-        System.out.println("ID: " + student.getId());
-        System.out.println("Name: " + student.getName());
-        System.out.println("DOB: " + student.getDob());
-        System.out.println("Enrolled Courses:");
-        for (int i = 0; i < courseManager.getCourses().size(); i++) {
-            // Only show courses the student is enrolled in
-            if (student.getMarks().get(i) != -1 && student.getAttendance().get(i) != -1) {
-                System.out.println("Course: " + courseManager.getCourses().get(i).getName());
-                System.out.println("    Marks: " + student.getMarks().get(i));
-                System.out.println("    Attendance: " + student.getAttendance().get(i));
-            }
-        }
     }
 
     static void showTeacherDetails(String courseName) {
