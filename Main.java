@@ -6,17 +6,16 @@ class Main {
 
     static TeacherManager teacherManager = new TeacherManager();
     static CourseManager courseManager;
-    static StudentRecords studentRecords;
-    static StudentEnrollment studentEnrollment;
+    static StudentManager studentRecords;
+    static StudentManager studentManager;
 
-    static void main(String[] args) throws IOException {
-        teacherManager.initializeTeachers("School-student-manager/Teachers.txt");
-
+    public static void main(String[] args) throws IOException {
         initializeCourses();
         
-        students = Student.loadStudents("School-student-manager/StudentProfile.txt", courseManager);
-        studentRecords = new StudentRecords(students, courseManager);
-        studentEnrollment = new StudentEnrollment(students, courseManager);
+        teacherManager.initializeTeachers("Teachers.txt");
+        students = Student.loadStudents("StudentProfile.txt", courseManager);
+        studentRecords = new StudentManager(students, courseManager);
+        studentManager = new StudentManager(students, courseManager);
 
         Scanner scanner = new Scanner(System.in);
         while (true) {
@@ -40,13 +39,13 @@ class Main {
             }
 
             switch (choice) {
-                case 1 -> studentEnrollment.addStudent(scanner);
-                case 2 -> studentEnrollment.removeStudent(scanner);
+                case 1 -> addStudent(scanner);
+                case 2 -> studentManager.removeStudent(scanner);
                 case 3 -> studentRecords.changeStudentDetails(scanner);
                 case 4 -> studentRecords.showStudentDetails(scanner);
                 case 5 -> courseManager.showCourseDetailsWithTeacherOption(scanner, students, teacherManager.getTeachers());
                 case 6 -> {
-                    studentEnrollment.saveStudents("School-student-manager/StudentProfile.txt");
+                    studentManager.saveStudents("School-student-manager/StudentProfile.txt");
                     System.out.println("Exiting...");
                     scanner.close();
                     return;
@@ -67,5 +66,46 @@ class Main {
 
         ArrayList<Course> courses = Course.initializeCourses(teacherNames, teacherCourses);
         courseManager = new CourseManager(courses);
+    }
+
+    static void addStudent(Scanner scanner) {
+        System.out.print("Enter name: ");
+        String name = scanner.nextLine();
+    
+        System.out.print("Enter ID: ");
+        String id = scanner.nextLine();
+        
+        // Extract student IDs into a separate list
+        ArrayList<String> studentIds = new ArrayList<>();
+        for (Student student : students) {
+            studentIds.add(student.getId());
+        }
+
+        // Check if the ID already exists
+        if (studentIds.contains(id)) {
+            System.out.println("Student ID already exists.");
+            return;
+        }
+
+        System.out.print("Enter Date of Birth (YYYY-MM-DD): ");
+        String dob = scanner.nextLine();
+
+        // Initialize marks and attendance with -1 for all courses (indicating not enrolled)
+        ArrayList<Integer> marks = new ArrayList<>(Collections.nCopies(courseManager.getCourses().size(), -1));
+        ArrayList<Integer> attendance = new ArrayList<>(Collections.nCopies(courseManager.getCourses().size(), -1));
+
+        // Display available courses
+        System.out.println("Available courses:");
+        for (int i = 0; i < courseManager.getCourses().size(); i++) {
+            Course course = courseManager.getCourses().get(i);
+            System.out.println((i + 1) + ". " + course.getName() + " (Semester: " + course.getSemester() + ", Period: " + course.getPeriod() + ")");
+        }
+
+        // Prompt the user to select courses
+        System.out.print("Enter the numbers of the courses you want to enroll in (comma-separated): ");
+        String[] selectedCourses = scanner.nextLine().split(",");
+    
+        // Call studentEnrollment with all collected data
+        studentManager.addStudent(id, name, dob, marks, attendance, selectedCourses);
     }
 }

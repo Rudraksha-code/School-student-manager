@@ -1,54 +1,19 @@
-import java.util.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.List;
+import java.util.Scanner;
 
-class StudentEnrollment {
+class StudentManager {
     private ArrayList<Student> students;
     private CourseManager courseManager;
 
-    StudentEnrollment(ArrayList<Student> students, CourseManager courseManager) {
+    StudentManager(ArrayList<Student> students, CourseManager courseManager) {
         this.students = students;
         this.courseManager = courseManager;
     }
 
-    void addStudent(Scanner scanner) {
-        System.out.print("Enter name: ");
-        String name = scanner.nextLine();
-
-        System.out.print("Enter ID: ");
-        String id = scanner.nextLine();
-
-        // Extract student IDs into a separate list
-        ArrayList<String> studentIds = new ArrayList<>();
-        for (Student student : students) {
-            studentIds.add(student.getId());
-        }
-
-        // Check if the ID already exists
-        if (studentIds.contains(id)) {
-            System.out.println("Student ID already exists.");
-            return;
-        }
-
-        System.out.print("Enter Date of Birth (YYYY-MM-DD): ");
-        String dob = scanner.nextLine();
-
-        // Initialize marks and attendance with -1 for all courses (indicating not enrolled)
-        ArrayList<Integer> marks = new ArrayList<>(Collections.nCopies(courseManager.getCourses().size(), -1));
-        ArrayList<Integer> attendance = new ArrayList<>(Collections.nCopies(courseManager.getCourses().size(), -1));
-
-        // Display available courses
-        System.out.println("Available courses:");
-        for (int i = 0; i < courseManager.getCourses().size(); i++) {
-            Course course = courseManager.getCourses().get(i);
-            System.out.println((i + 1) + ". " + course.getName() + " (Semester: " + course.getSemester() + ", Period: " + course.getPeriod() + ")");
-        }
-
-        // Prompt the user to select courses
-        System.out.print("Enter the numbers of the courses you want to enroll in (comma-separated): ");
-        String[] selectedCourses = scanner.nextLine().split(",");
-
+    void addStudent(String id, String name, String dob, ArrayList<Integer> marks, ArrayList<Integer> attendance, String[] selectedCourses) {
         ArrayList<String> enrolledCourses = new ArrayList<>();
         ArrayList<String> conflictCourses = new ArrayList<>();
 
@@ -144,5 +109,79 @@ class StudentEnrollment {
             studentLines.add(sb.toString());
         }
         Utils.writeLinesToFile(filePath, studentLines);
+    }
+
+    void changeStudentDetails(Scanner scanner) {
+        System.out.print("Enter Student ID: ");
+        String id = scanner.nextLine();
+        Student student = students.stream().filter(s -> s.getId().equals(id)).findFirst().orElse(null);
+        if (student == null) {
+            System.out.println("Student not found.");
+            return;
+        }
+
+        System.out.println("Enrolled Courses:");
+        ArrayList<Integer> enrolledCourses = new ArrayList<>();
+        for (int i = 0; i < courseManager.getCourses().size(); i++) {
+            if (student.getMarks().get(i) != -1 && student.getAttendance().get(i) != -1) {
+                System.out.println((enrolledCourses.size() + 1) + ". " + courseManager.getCourses().get(i).getName());
+                enrolledCourses.add(i);
+            }
+        }
+
+        if (enrolledCourses.isEmpty()) {
+            System.out.println("The student is not enrolled in any courses.");
+            return;
+        }
+
+        System.out.print("Enter the number of the course to update: ");
+        int courseChoice;
+        try {
+            courseChoice = scanner.nextInt();
+            scanner.nextLine();
+            if (courseChoice < 1 || courseChoice > enrolledCourses.size()) {
+                System.out.println("Invalid course number.");
+                return;
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter a number.");
+            scanner.nextLine();
+            return;
+        }
+
+        int courseIndex = enrolledCourses.get(courseChoice - 1);
+
+        System.out.print("Enter new marks: ");
+        int marks = scanner.nextInt();
+        System.out.print("Enter new attendance: ");
+        int attendance = scanner.nextInt();
+        scanner.nextLine();
+
+        student.getMarks().set(courseIndex, marks);
+        student.getAttendance().set(courseIndex, attendance);
+
+        System.out.println("Student details updated successfully.");
+    }
+
+    void showStudentDetails(Scanner scanner) {
+        System.out.print("Enter Student ID: ");
+        String id = scanner.nextLine();
+        Student student = students.stream().filter(s -> s.getId().equals(id)).findFirst().orElse(null);
+        if (student == null) {
+            System.out.println("Student not found.");
+            return;
+        }
+
+        System.out.println("ID: " + student.getId());
+        System.out.println("Name: " + student.getName());
+        System.out.println("DOB: " + student.getDob());
+        System.out.println("Enrolled Courses:");
+        for (int i = 0; i < courseManager.getCourses().size(); i++) {
+            if (student.getMarks().get(i) != -1 && student.getAttendance().get(i) != -1) {
+                System.out.println("Course: " + courseManager.getCourses().get(i).getName());
+                System.out.println("    Marks: " + student.getMarks().get(i));
+                System.out.println("    Attendance: " + student.getAttendance().get(i));
+            }
+        }
     }
 }
