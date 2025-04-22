@@ -6,14 +6,14 @@ class Course {
     private int semester;
     private int period;
 
-    public Course(String name, int semester, int period, String teacher) {
+    Course(String name, int semester, int period, String teacher) {
         this.name = name;
         this.teacher = teacher; 
         this.semester = semester;
         this.period = period;
     }
     
-    public static ArrayList<Course> initializeCourses(ArrayList<String> teacherNames, ArrayList<ArrayList<String>> teacherCourses) {
+    static ArrayList<Course> initializeCourses(ArrayList<String> teacherNames, ArrayList<ArrayList<String>> teacherCourses) {
         ArrayList<Course> courses = new ArrayList<>();
         ArrayList<String> allCourseNames = new ArrayList<>();
         
@@ -49,31 +49,31 @@ class Course {
         return courses;
     }
 
-    public String getName() {
+    String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    void setName(String name) {
         this.name = name;
     }
 
-    public String getTeacher() { 
+    String getTeacher() { 
         return teacher;
     }
 
-    public int getSemester() {
+    int getSemester() {
         return semester;
     }
 
-    public void setSemester(int semester) {
+    void setSemester(int semester) {
         this.semester = semester;
     }
 
-    public int getPeriod() {
+    int getPeriod() {
         return period;
     }
 
-    public void setPeriod(int period) {
+    void setPeriod(int period) {
         this.period = period;
     }
 

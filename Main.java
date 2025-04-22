@@ -1,7 +1,7 @@
 import java.io.IOException;
 import java.util.*;
 
-public class Main {
+class Main {
     static ArrayList<Student> students = new ArrayList<>();
 
     static TeacherManager teacherManager = new TeacherManager();
@@ -9,7 +9,7 @@ public class Main {
     static StudentRecords studentRecords;
     static StudentEnrollment studentEnrollment;
 
-    public static void main(String[] args) throws IOException {
+    static void main(String[] args) throws IOException {
         teacherManager.initializeTeachers("School-student-manager/Teachers.txt");
 
         initializeCourses();

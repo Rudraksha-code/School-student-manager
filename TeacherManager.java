@@ -3,18 +3,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class TeacherManager {
+class TeacherManager {
     private ArrayList<Teacher> teachers;
 
-    public TeacherManager() {
+    TeacherManager() {
         this.teachers = new ArrayList<>();
     }
 
-    public ArrayList<Teacher> getTeachers() {
+    ArrayList<Teacher> getTeachers() {
         return teachers;
     }
 
-    public void initializeTeachers(String filePath) throws IOException {
+    void initializeTeachers(String filePath) throws IOException {
         List<String> teacherLines = Utils.readLinesFromFile(filePath);
         for (String line : teacherLines) {
             String[] parts = line.split(", ", 4); // Split into 4 parts: ID, Name, DOB, and Courses

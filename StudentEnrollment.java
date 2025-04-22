@@ -3,16 +3,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StudentEnrollment {
+class StudentEnrollment {
     private ArrayList<Student> students;
     private CourseManager courseManager;
 
-    public StudentEnrollment(ArrayList<Student> students, CourseManager courseManager) {
+    StudentEnrollment(ArrayList<Student> students, CourseManager courseManager) {
         this.students = students;
         this.courseManager = courseManager;
     }
 
-    public void addStudent(Scanner scanner) {
+    void addStudent(Scanner scanner) {
         System.out.print("Enter name: ");
         String name = scanner.nextLine();
 
@@ -106,7 +106,7 @@ public class StudentEnrollment {
         System.out.println("Student added successfully.");
     }
 
-    public void removeStudent(Scanner scanner) {
+    void removeStudent(Scanner scanner) {
         System.out.print("Enter Student ID to remove: ");
         String id = scanner.nextLine();
 
@@ -121,7 +121,7 @@ public class StudentEnrollment {
         }
     }
 
-    public void saveStudents(String filePath) throws IOException {
+    void saveStudents(String filePath) throws IOException {
         List<String> studentLines = new ArrayList<>();
 
         for (Student student : students) {

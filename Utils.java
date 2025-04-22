@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Utils {
+class Utils {
 
     static List<String> readLinesFromFile(String filePath) throws IOException {
         List<String> lines = new ArrayList<>();

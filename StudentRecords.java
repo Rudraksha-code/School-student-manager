@@ -6,12 +6,12 @@ class StudentRecords {
     private ArrayList<Student> students;
     private CourseManager courseManager;
 
-    public StudentRecords(ArrayList<Student> students, CourseManager courseManager) {
+    StudentRecords(ArrayList<Student> students, CourseManager courseManager) {
         this.students = students;
         this.courseManager = courseManager;
     }
 
-    public void changeStudentDetails(Scanner scanner) {
+    void changeStudentDetails(Scanner scanner) {
         System.out.print("Enter Student ID: ");
         String id = scanner.nextLine();
         Student student = students.stream().filter(s -> s.getId().equals(id)).findFirst().orElse(null);
@@ -63,7 +63,7 @@ class StudentRecords {
         System.out.println("Student details updated successfully.");
     }
 
-    public void showStudentDetails(Scanner scanner) {
+    void showStudentDetails(Scanner scanner) {
         System.out.print("Enter Student ID: ");
         String id = scanner.nextLine();
         Student student = students.stream().filter(s -> s.getId().equals(id)).findFirst().orElse(null);

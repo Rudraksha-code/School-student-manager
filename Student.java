@@ -6,7 +6,7 @@ class Student extends Person {
     private ArrayList<Integer> marks;
     private ArrayList<Integer> attendance;
 
-    public Student(String id, String name, String dob, ArrayList<Integer> marks, ArrayList<Integer> attendance) {
+    Student(String id, String name, String dob, ArrayList<Integer> marks, ArrayList<Integer> attendance) {
         // used super to call the constructor of the parent class (Person)
         super(id, name, dob);
 
@@ -15,24 +15,24 @@ class Student extends Person {
         this.attendance = attendance;
     }
 
-    public ArrayList<Integer> getMarks() {
+    ArrayList<Integer> getMarks() {
         return marks;
     }
 
-    public ArrayList<Integer> getAttendance() {
+    ArrayList<Integer> getAttendance() {
         return attendance;
     }
 
-    public void setMarks(ArrayList<Integer> marks) {
+    void setMarks(ArrayList<Integer> marks) {
         this.marks = marks;
     }
 
-    public void setAttendance(ArrayList<Integer> attendance) {
+    void setAttendance(ArrayList<Integer> attendance) {
         this.attendance = attendance;
     }
 
     // A method to load students from the StudentProfile file
-    public static ArrayList<Student> loadStudents(String filePath, CourseManager courseManager) throws IOException {
+    static ArrayList<Student> loadStudents(String filePath, CourseManager courseManager) throws IOException {
         ArrayList<Student> students = new ArrayList<>();
         List<String> studentLines = Utils.readLinesFromFile(filePath);
 

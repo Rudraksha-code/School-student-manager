@@ -1,18 +1,18 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class CourseManager {
+class CourseManager {
     private ArrayList<Course> courses;
 
-    public CourseManager(ArrayList<Course> courses) {
+    CourseManager(ArrayList<Course> courses) {
         this.courses = courses;
     }
 
-    public ArrayList<Course> getCourses() {
+    ArrayList<Course> getCourses() {
         return courses;
     }
 
-    public void showCourseDetails(ArrayList<String> studentIds, ArrayList<String> studentNames, ArrayList<ArrayList<Integer>> studentMarks, ArrayList<ArrayList<Integer>> studentAttendance) {
+    void showCourseDetails(ArrayList<String> studentIds, ArrayList<String> studentNames, ArrayList<ArrayList<Integer>> studentMarks, ArrayList<ArrayList<Integer>> studentAttendance) {
         for (Course course : courses) {
             System.out.println("Course: " + course.getName());
             System.out.println("  Teacher: " + course.getTeacher());
@@ -29,7 +29,7 @@ public class CourseManager {
         }
     }
 
-    public void showCourseDetailsWithTeacherOption(Scanner scanner, ArrayList<Student> students, ArrayList<Teacher> teachers) {
+    void showCourseDetailsWithTeacherOption(Scanner scanner, ArrayList<Student> students, ArrayList<Teacher> teachers) {
         ArrayList<String> studentIds = new ArrayList<>();
         ArrayList<String> studentNames = new ArrayList<>();
         ArrayList<ArrayList<Integer>> studentMarks = new ArrayList<>();
@@ -53,7 +53,7 @@ public class CourseManager {
         }
     }
 
-    public int getCourseIndex(String courseName) {
+    int getCourseIndex(String courseName) {
         for (int i = 0; i < courses.size(); i++) {
             if (courses.get(i).getName().equals(courseName)) {
                 return i;
