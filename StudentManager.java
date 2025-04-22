@@ -71,19 +71,9 @@ class StudentManager {
         System.out.println("Student added successfully.");
     }
 
-    void removeStudent(Scanner scanner) {
-        System.out.print("Enter Student ID to remove: ");
-        String id = scanner.nextLine();
-
-        // Check if a student with the given ID exists
-        boolean removed = students.removeIf(student -> student.getId().equals(id));
-
-        if (removed) {
-            System.out.println("Student removed successfully.");
-        } 
-        else {
-            System.out.println("Student not found.");
-        }
+    boolean removeStudent(String id) {
+        boolean removed = students.removeIf(student -> student.getId().equals(id));;
+        return removed;
     }
 
     void saveStudents(String filePath) throws IOException {

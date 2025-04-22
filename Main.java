@@ -40,12 +40,12 @@ class Main {
 
             switch (choice) {
                 case 1 -> addStudent(scanner);
-                case 2 -> studentManager.removeStudent(scanner);
+                case 2 -> removeStudent(scanner);
                 case 3 -> studentRecords.changeStudentDetails(scanner);
                 case 4 -> studentRecords.showStudentDetails(scanner);
                 case 5 -> courseManager.showCourseDetailsWithTeacherOption(scanner, students, teacherManager.getTeachers());
                 case 6 -> {
-                    studentManager.saveStudents("School-student-manager/StudentProfile.txt");
+                    studentManager.saveStudents("StudentProfile.txt");
                     System.out.println("Exiting...");
                     scanner.close();
                     return;
@@ -107,5 +107,19 @@ class Main {
     
         // Call studentEnrollment with all collected data
         studentManager.addStudent(id, name, dob, marks, attendance, selectedCourses);
+    }
+
+    static void removeStudent(Scanner scanner) {
+        System.out.print("Enter Student ID to remove: ");
+        String id = scanner.nextLine();
+
+        boolean removed = studentManager.removeStudent(id);
+
+        if (removed) {
+            System.out.println("Student removed successfully.");
+        } 
+        else {
+            System.out.println("Student not found.");
+        }
     }
 }
