@@ -10,9 +10,9 @@ class Main {
     static StudentManager studentManager;
 
     public static void main(String[] args) throws IOException {
+        teacherManager.initializeTeachers("Teachers.txt");
         initializeCourses();
         
-        teacherManager.initializeTeachers("Teachers.txt");
         students = Student.loadStudents("StudentProfile.txt", courseManager);
         studentRecords = new StudentManager(students, courseManager);
         studentManager = new StudentManager(students, courseManager);
