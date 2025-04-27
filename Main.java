@@ -11,7 +11,9 @@ class Main {
 
     public static void main(String[] args) throws IOException {
         teacherManager.initializeTeachers("Teachers.txt");
-        initializeCourses();
+        
+        courseManager = new CourseManager(new ArrayList<>());
+        courseManager.initializeCourses(teacherManager.getTeachers());
         
         students = Student.loadStudents("StudentProfile.txt", courseManager);
         studentRecords = new StudentManager(students, courseManager);
@@ -53,19 +55,6 @@ class Main {
                 default -> System.out.println("Invalid option. Please choose a number between 1 and 6.");
             }
         }
-    }
-
-    static void initializeCourses() {
-        ArrayList<String> teacherNames = new ArrayList<>();
-        ArrayList<ArrayList<String>> teacherCourses = new ArrayList<>();
-
-        for (Teacher teacher : teacherManager.getTeachers()) {
-            teacherNames.add(teacher.getName());
-            teacherCourses.add(teacher.getCourses());
-        }
-
-        ArrayList<Course> courses = Course.initializeCourses(teacherNames, teacherCourses);
-        courseManager = new CourseManager(courses);
     }
 
     static void addStudent(Scanner scanner) {

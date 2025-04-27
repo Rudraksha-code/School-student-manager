@@ -12,6 +12,18 @@ class CourseManager {
         return courses;
     }
 
+    void initializeCourses(ArrayList<Teacher> teachers) {
+        ArrayList<String> teacherNames = new ArrayList<>();
+        ArrayList<ArrayList<String>> teacherCourses = new ArrayList<>();
+    
+        for (Teacher teacher : teachers) {
+            teacherNames.add(teacher.getName());
+            teacherCourses.add(teacher.getCourses());
+        }
+    
+        this.courses = Course.initializeCourses(teacherNames, teacherCourses);
+    }
+
     void showCourseDetailsWithTeacherOption(Scanner scanner, ArrayList<Student> students, ArrayList<Teacher> teachers) {
         ArrayList<String> studentIds = new ArrayList<>();
         ArrayList<String> studentNames = new ArrayList<>();
