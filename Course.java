@@ -13,7 +13,7 @@ class Course {
         this.period = period;
     }
     
-    static ArrayList<Course> initializeCourses(ArrayList<String> teacherNames, ArrayList<ArrayList<String>> teacherCourses) {
+    static ArrayList<Course> initializeEachCourse(ArrayList<String> teacherNames, ArrayList<ArrayList<String>> teacherCourses) {
         ArrayList<Course> courses = new ArrayList<>();
         ArrayList<String> allCourseNames = new ArrayList<>();
         

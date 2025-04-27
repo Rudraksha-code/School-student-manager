@@ -21,7 +21,7 @@ class CourseManager {
             teacherCourses.add(teacher.getCourses());
         }
     
-        this.courses = Course.initializeCourses(teacherNames, teacherCourses);
+        this.courses = Course.initializeEachCourse(teacherNames, teacherCourses);
     }
 
     void showCourseDetailsWithTeacherOption(Scanner scanner, ArrayList<Student> students, ArrayList<Teacher> teachers) {
