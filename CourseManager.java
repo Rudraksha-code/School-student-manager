@@ -12,23 +12,6 @@ class CourseManager {
         return courses;
     }
 
-    void showCourseDetails(ArrayList<String> studentIds, ArrayList<String> studentNames, ArrayList<ArrayList<Integer>> studentMarks, ArrayList<ArrayList<Integer>> studentAttendance) {
-        for (Course course : courses) {
-            System.out.println("Course: " + course.getName());
-            System.out.println("  Teacher: " + course.getTeacher());
-            System.out.println("  Semester: " + course.getSemester());
-            System.out.println("  Period: " + course.getPeriod());
-            System.out.println("  Students:");
-            for (int i = 0; i < studentIds.size(); i++) {
-                int courseIndex = getCourseIndex(course.getName());
-                if (courseIndex != -1 && studentMarks.get(i).get(courseIndex) != -1 && studentAttendance.get(i).get(courseIndex) != -1) {
-                    System.out.println("    - " + studentNames.get(i) + " (ID: " + studentIds.get(i) + ")");
-                }
-            }
-            System.out.println();
-        }
-    }
-
     void showCourseDetailsWithTeacherOption(Scanner scanner, ArrayList<Student> students, ArrayList<Teacher> teachers) {
         ArrayList<String> studentIds = new ArrayList<>();
         ArrayList<String> studentNames = new ArrayList<>();
@@ -42,15 +25,7 @@ class CourseManager {
             studentAttendance.add(student.getAttendance());
         }
     
-        showCourseDetails(studentIds, studentNames, studentMarks, studentAttendance);
-    
-        System.out.print("\nWould you like to view the teacher's details for a specific course? (yes/no): ");
-        String response = scanner.nextLine().trim().toLowerCase();
-        if (response.equals("yes")) {
-            System.out.print("Enter the name of the course: ");
-            String courseName = scanner.nextLine().trim();
-            Teacher.showTeacherDetails(teachers, courses, courseName);
-        }
+        Main.showCourseDetails(scanner, studentIds, studentNames, studentMarks, studentAttendance);
     }
 
     int getCourseIndex(String courseName) {

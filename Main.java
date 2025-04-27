@@ -41,8 +41,8 @@ class Main {
             switch (choice) {
                 case 1 -> addStudent(scanner);
                 case 2 -> removeStudent(scanner);
-                case 3 -> studentRecords.changeStudentDetails(scanner);
-                case 4 -> studentRecords.showStudentDetails(scanner);
+                case 3 -> changeStudentDetails(scanner);
+                case 4 -> showStudentDetails(scanner);
                 case 5 -> courseManager.showCourseDetailsWithTeacherOption(scanner, students, teacherManager.getTeachers());
                 case 6 -> {
                     studentManager.saveStudents("StudentProfile.txt");
@@ -109,6 +109,24 @@ class Main {
         studentManager.addStudent(id, name, dob, marks, attendance, selectedCourses);
     }
 
+    static void enrollmentSummary(ArrayList<String> enrolledCourses, ArrayList<String> conflictCourses) {
+        // Display summary of enrollment
+        System.out.println("\nEnrollment Summary:");
+        if (!enrolledCourses.isEmpty()) {
+            System.out.println("Successfully enrolled in:");
+            for (String course : enrolledCourses) {
+                System.out.println("  - " + course);
+            }
+        }
+        if (!conflictCourses.isEmpty()) {
+            System.out.println("Could not enroll due to time conflicts:");
+            for (String course : conflictCourses) {
+                System.out.println("  - " + course);
+            }
+        }
+        System.out.println("Student added successfully.");
+    }
+
     static void removeStudent(Scanner scanner) {
         System.out.print("Enter Student ID to remove: ");
         String id = scanner.nextLine();
@@ -120,6 +138,124 @@ class Main {
         } 
         else {
             System.out.println("Student not found.");
+        }
+    }
+    
+    static void changeStudentDetails(Scanner scanner) {
+        System.out.print("Enter Student ID: ");
+        String id = scanner.nextLine();
+        
+        Student student = studentRecords.findStudentById(id);
+        if (student == null) {
+            System.out.println("Student not found.");
+            return;
+        }
+
+        // Get enrolled courses
+        ArrayList<Integer> enrolledCourses = new ArrayList<>();
+        System.out.println("Enrolled Courses:");
+        for (int i = 0; i < courseManager.getCourses().size(); i++) {
+            if (student.getMarks().get(i) != -1 && student.getAttendance().get(i) != -1) {
+                System.out.println((enrolledCourses.size() + 1) + ". " + courseManager.getCourses().get(i).getName());
+                enrolledCourses.add(i);
+            }
+        }
+
+        if (enrolledCourses.isEmpty()) {
+            System.out.println("The student is not enrolled in any courses.");
+            return;
+        }
+
+        System.out.print("Enter the number of the course to update: ");
+        int courseChoice;
+        try {
+            courseChoice = scanner.nextInt();
+            scanner.nextLine();
+            if (courseChoice < 1 || courseChoice > enrolledCourses.size()) {
+                System.out.println("Invalid course number.");
+                return;
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter a number.");
+            scanner.nextLine();
+            return;
+        }
+
+        int courseIndex = enrolledCourses.get(courseChoice - 1);
+
+        System.out.print("Enter new marks: ");
+        int marks = scanner.nextInt();
+        System.out.print("Enter new attendance: ");
+        int attendance = scanner.nextInt();
+        scanner.nextLine();
+
+        studentRecords.updateStudentCourseDetails(student, courseIndex, marks, attendance);
+        System.out.println("Student details updated successfully.");
+    }
+    
+    static void showStudentDetails(Scanner scanner) {
+        System.out.print("Enter Student ID: ");
+        String id = scanner.nextLine();
+        
+        Student student = studentRecords.findStudentById(id);
+        if (student == null) {
+            System.out.println("Student not found.");
+            return;
+        }
+
+        System.out.println("ID: " + student.getId());
+        System.out.println("Name: " + student.getName());
+        System.out.println("DOB: " + student.getDob());
+        System.out.println("Enrolled Courses:");
+        for (int i = 0; i < courseManager.getCourses().size(); i++) {
+            if (student.getMarks().get(i) != -1 && student.getAttendance().get(i) != -1) {
+                System.out.println("Course: " + courseManager.getCourses().get(i).getName());
+                System.out.println("    Marks: " + student.getMarks().get(i));
+                System.out.println("    Attendance: " + student.getAttendance().get(i));
+            }
+        }
+    }
+    
+    static void showCourseDetails(Scanner scanner, ArrayList<String> studentIds, ArrayList<String> studentNames, ArrayList<ArrayList<Integer>> studentMarks, ArrayList<ArrayList<Integer>> studentAttendance) {
+        // Display course details
+        for (Course course : courseManager.getCourses()) {
+            System.out.println("Course: " + course.getName());
+            System.out.println("  Teacher: " + course.getTeacher());
+            System.out.println("  Semester: " + course.getSemester());
+            System.out.println("  Period: " + course.getPeriod());
+            System.out.println("  Students:");
+            
+            int courseIndex = courseManager.getCourseIndex(course.getName());
+            if (courseIndex != -1) {
+                for (int i = 0; i < studentIds.size(); i++) {
+                    if (studentMarks.get(i).get(courseIndex) != -1 && studentAttendance.get(i).get(courseIndex) != -1) {
+                        System.out.println("    - " + studentNames.get(i) + " (ID: " + studentIds.get(i) + ")");
+                    }
+                }
+            }
+            System.out.println();
+        }
+        viewTeacherDetail(scanner);
+    }
+
+    static void viewTeacherDetail(Scanner scanner) {
+        System.out.print("\nWould you like to view the teacher's details for a specific course? (yes/no): ");
+        String response = scanner.nextLine().trim().toLowerCase();
+        if (response.equals("yes")) {
+            System.out.print("Enter the name of the course: ");
+            String courseName = scanner.nextLine().trim();
+            
+            Teacher teacher = Teacher.showTeacherDetails(teacherManager.getTeachers(), courseManager.getCourses(), courseName);
+
+            if (teacher != null) {
+                System.out.println("Teacher Details:");
+                System.out.println("  ID: " + teacher.getId());
+                System.out.println("  Name: " + teacher.getName());
+                System.out.println("  DOB: " + teacher.getDob());
+                System.out.println("  Courses: " + String.join(", ", teacher.getCourses()));
+            } else {
+                System.out.println("No teacher found for this course.");
+            }
         }
     }
 }

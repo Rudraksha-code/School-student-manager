@@ -17,7 +17,7 @@ class Teacher extends Person {
     }
 
     // Static method to show teacher details for a specific course
-    static void showTeacherDetails(ArrayList<Teacher> teachers, ArrayList<Course> courses, String courseName) {
+    static Teacher showTeacherDetails(ArrayList<Teacher> teachers, ArrayList<Course> courses, String courseName) {
         // First find the teacher assigned to teach this course in the system
         String assignedTeacherName = null;
         for (Course course : courses) {
@@ -31,16 +31,11 @@ class Teacher extends Person {
             // Find the teacher by name
             for (Teacher teacher : teachers) {
                 if (teacher.getName().equals(assignedTeacherName)) {
-                    System.out.println("Teacher Details:");
-                    System.out.println("  ID: " + teacher.getId());
-                    System.out.println("  Name: " + teacher.getName());
-                    System.out.println("  DOB: " + teacher.getDob());
-                    System.out.println("  Courses: " + String.join(", ", teacher.getCourses()));
-                    return;
+                    return teacher;
                 }
             }
         }
-        
-        System.out.println("No teacher found for this course.");
+        // If no teacher is found, return null
+        return null;
     }
 }
