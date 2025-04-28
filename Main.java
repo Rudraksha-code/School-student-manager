@@ -96,18 +96,12 @@ class Main {
         studentManager.addStudent(id, name, dob, marks, attendance, selectedCourses);
     }
 
-    static void enrollmentSummary(ArrayList<String> enrolledCourses, ArrayList<String> conflictCourses) {
+    static void enrollmentSummary(ArrayList<String> enrolledCourses) {
         // Display summary of enrollment
         System.out.println("\nEnrollment Summary:");
         if (!enrolledCourses.isEmpty()) {
             System.out.println("Successfully enrolled in:");
             for (String course : enrolledCourses) {
-                System.out.println("  - " + course);
-            }
-        }
-        if (!conflictCourses.isEmpty()) {
-            System.out.println("Could not enroll due to time conflicts:");
-            for (String course : conflictCourses) {
                 System.out.println("  - " + course);
             }
         }

@@ -13,28 +13,28 @@ class Course {
         this.period = period;
     }
     
-    static ArrayList<Course> initializeEachCourse(ArrayList<String> teacherNames, ArrayList<ArrayList<String>> teacherCourses) {
+    static ArrayList<Course> initializeEachCourse(ArrayList<String> courseNames, ArrayList<Teacher> teachers) {
         ArrayList<Course> courses = new ArrayList<>();
-        ArrayList<String> allCourseNames = new ArrayList<>();
         
-        // First, collect all unique course names from all teachers
-        for (ArrayList<String> coursesForTeacher : teacherCourses) {
-            for (String courseName : coursesForTeacher) {
-                if (!allCourseNames.contains(courseName)) {
-                    allCourseNames.add(courseName);
-                }
-            }
-        }
-        
-        // Now assign each course to a teacher based on index
         int semester = 1; // Start with semester 1
         int period = 1;   // Start with period 1
         
-        for (int i = 0; i < Math.min(allCourseNames.size(), 9); i++) { // Limit to 9 courses
-            String courseName = allCourseNames.get(i);
-            String teacherName = (i < teacherNames.size()) ? teacherNames.get(i) : "Unassigned";
+        // Get a list of teacher names for direct assignment
+        ArrayList<String> teacherNames = new ArrayList<>();
+        for (Teacher teacher : teachers) {
+            teacherNames.add(teacher.getName());
+        }
+        
+        for (int i = 0; i < courseNames.size(); i++) {
+            String courseName = courseNames.get(i);
             
-            courses.add(new Course(courseName, semester, period, teacherName));
+            // Assign teacher using modulo to cycle through the available teachers
+            String assignedTeacher = "Unassigned";
+            if (!teacherNames.isEmpty()) {
+                assignedTeacher = teacherNames.get(i % teacherNames.size());
+            }
+            
+            courses.add(new Course(courseName, semester, period, assignedTeacher));
             
             period++; // Increment period for the next course
             if (period > 4) { // Reset period after 4 and move to the next semester
@@ -45,7 +45,6 @@ class Course {
                 }
             }
         }
-        
         return courses;
     }
 

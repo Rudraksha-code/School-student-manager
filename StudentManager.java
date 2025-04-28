@@ -13,7 +13,6 @@ class StudentManager {
 
     void addStudent(String id, String name, String dob, ArrayList<Integer> marks, ArrayList<Integer> attendance, String[] selectedCourses) {
         ArrayList<String> enrolledCourses = new ArrayList<>();
-        ArrayList<String> conflictCourses = new ArrayList<>();
 
         // Update marks and attendance for selected courses
         for (String courseIndexStr : selectedCourses) {
@@ -21,25 +20,9 @@ class StudentManager {
                 int courseIndex = Integer.parseInt(courseIndexStr.trim()) - 1;
                 if (courseIndex >= 0 && courseIndex < courseManager.getCourses().size()) {
                     Course course = courseManager.getCourses().get(courseIndex);
-                    int period = course.getPeriod();
-                    int semester = course.getSemester();
-
-                    // Check for conflicts
-                    boolean conflict = false;
-                    for (String enrolledCourse : enrolledCourses) {
-                        if (enrolledCourse.contains("Semester " + semester) && enrolledCourse.contains("Period " + period)) {
-                            conflict = true;
-                            break;
-                        }
-                    }
-
-                    if (conflict) {
-                        conflictCourses.add(course.getName() + " (Semester " + semester + ", Period " + period + ")");
-                    } else {
-                        marks.set(courseIndex, 0); // Initialize marks to 0
-                        attendance.set(courseIndex, 0); // Initialize attendance to 0
-                        enrolledCourses.add(course.getName() + " (Semester " + semester + ", Period " + period + ")");
-                    }
+                    marks.set(courseIndex, 0); // Initialize marks to 0
+                    attendance.set(courseIndex, 0); // Initialize attendance to 0
+                    enrolledCourses.add(course.getName() + " (Semester " + course.getSemester() + ", Period " + course.getPeriod() + ")");
                 } else {
                     System.out.println("Invalid course number: " + (courseIndex + 1));
                 }
@@ -51,7 +34,7 @@ class StudentManager {
         // Add student details to the list
         students.add(new Student(id, name, dob, marks, attendance));
         
-        Main.enrollmentSummary(enrolledCourses, conflictCourses);
+        Main.enrollmentSummary(enrolledCourses);
     }
 
     boolean removeStudent(String id) {

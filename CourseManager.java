@@ -1,4 +1,6 @@
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 class CourseManager {
     private ArrayList<Course> courses;
@@ -11,16 +13,12 @@ class CourseManager {
         return courses;
     }
 
-    void initializeCourses(ArrayList<Teacher> teachers) {
-        ArrayList<String> teacherNames = new ArrayList<>();
-        ArrayList<ArrayList<String>> teacherCourses = new ArrayList<>();
-    
-        for (Teacher teacher : teachers) {
-            teacherNames.add(teacher.getName());
-            teacherCourses.add(teacher.getCourses());
-        }
-    
-        this.courses = Course.initializeEachCourse(teacherNames, teacherCourses);
+    void initializeCourses(ArrayList<Teacher> teachers) throws IOException {
+        // Read course names from Courses.txt
+        List<String> courseNames = Utils.readLinesFromFile("Courses.txt");
+        ArrayList<String> courseList = new ArrayList<>(courseNames);
+        
+        this.courses = Course.initializeEachCourse(courseList, teachers);
     }
 
     int getCourseIndex(String courseName) {

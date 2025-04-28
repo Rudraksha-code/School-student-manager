@@ -6,4 +6,3 @@ ID: T005, Name: Dr. Brown, DOB: 1968-11-05, Courses: Chemistry, Biology
 ID: T006, Name: Ms. Taylor, DOB: 1983-06-12, Courses: Biology, Chemistry
 ID: T007, Name: Mrs. Davis, DOB: 1985-01-10, Courses: English, French
 ID: T008, Name: Ms. Green, DOB: 1990-04-05, Courses: French, English
-ID: T009, Name: Mr. Wilson, DOB: 1972-09-30, Courses: Computer Science, Biology
