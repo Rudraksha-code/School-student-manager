@@ -6,7 +6,6 @@ class Main {
 
     static TeacherManager teacherManager = new TeacherManager();
     static CourseManager courseManager;
-    static StudentManager studentRecords;
     static StudentManager studentManager;
 
     public static void main(String[] args) throws IOException {
@@ -16,7 +15,6 @@ class Main {
         courseManager.initializeCourses(teacherManager.getTeachers());
         
         students = Student.loadStudents("StudentProfile.txt", courseManager);
-        studentRecords = new StudentManager(students, courseManager);
         studentManager = new StudentManager(students, courseManager);
 
         Scanner scanner = new Scanner(System.in);
@@ -134,7 +132,7 @@ class Main {
         System.out.print("Enter Student ID: ");
         String id = scanner.nextLine();
         
-        Student student = studentRecords.findStudentById(id);
+        Student student = studentManager.findStudentById(id);
         if (student == null) {
             System.out.println("Student not found.");
             return;
@@ -178,7 +176,7 @@ class Main {
         int attendance = scanner.nextInt();
         scanner.nextLine();
 
-        studentRecords.updateStudentCourseDetails(student, courseIndex, marks, attendance);
+        studentManager.updateStudentCourseDetails(student, courseIndex, marks, attendance);
         System.out.println("Student details updated successfully.");
     }
     
@@ -186,7 +184,7 @@ class Main {
         System.out.print("Enter Student ID: ");
         String id = scanner.nextLine();
         
-        Student student = studentRecords.findStudentById(id);
+        Student student = studentManager.findStudentById(id);
         if (student == null) {
             System.out.println("Student not found.");
             return;
@@ -197,7 +195,7 @@ class Main {
         System.out.println("DOB: " + student.getDob());
         System.out.println("Enrolled Courses:");
         for (int i = 0; i < courseManager.getCourses().size(); i++) {
-            if (student.getMarks().get(i) != -1 && student.getAttendance().get(i) != -1) {
+            if (student.getAttendance().get(i) != -1) {
                 System.out.println("Course: " + courseManager.getCourses().get(i).getName());
                 System.out.println("    Marks: " + student.getMarks().get(i));
                 System.out.println("    Attendance: " + student.getAttendance().get(i));
@@ -205,7 +203,7 @@ class Main {
         }
     }
     
-    static void showCourseDetails(Scanner scanner, ArrayList<String> studentIds, ArrayList<String> studentNames, ArrayList<ArrayList<Integer>> studentMarks, ArrayList<ArrayList<Integer>> studentAttendance) {
+    static void showCourseDetails(Scanner scanner, ArrayList<Student> students) {
         // Display course details
         for (Course course : courseManager.getCourses()) {
             System.out.println("Course: " + course.getName());
@@ -216,9 +214,9 @@ class Main {
             
             int courseIndex = courseManager.getCourseIndex(course.getName());
             if (courseIndex != -1) {
-                for (int i = 0; i < studentIds.size(); i++) {
-                    if (studentMarks.get(i).get(courseIndex) != -1 && studentAttendance.get(i).get(courseIndex) != -1) {
-                        System.out.println("    - " + studentNames.get(i) + " (ID: " + studentIds.get(i) + ")");
+                for (Student student : students) {
+                    if (student.getMarks().get(courseIndex) != -1 && student.getAttendance().get(courseIndex) != -1) {
+                        System.out.println("    - " + student.getName() + " (ID: " + student.getId() + ")");
                     }
                 }
             }
