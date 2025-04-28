@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Scanner;
 
 class CourseManager {
     private ArrayList<Course> courses;
@@ -22,10 +21,6 @@ class CourseManager {
         }
     
         this.courses = Course.initializeEachCourse(teacherNames, teacherCourses);
-    }
-
-    void showCourseDetailsWithTeacherOption(Scanner scanner, ArrayList<Student> students, ArrayList<Teacher> teachers) {
-    Main.showCourseDetails(scanner, students);
     }
 
     int getCourseIndex(String courseName) {

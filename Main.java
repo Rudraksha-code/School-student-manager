@@ -43,7 +43,7 @@ class Main {
                 case 2 -> removeStudent(scanner);
                 case 3 -> changeStudentDetails(scanner);
                 case 4 -> showStudentDetails(scanner);
-                case 5 -> courseManager.showCourseDetailsWithTeacherOption(scanner, students, teacherManager.getTeachers());
+                case 5 -> showCourseDetails(scanner, students);
                 case 6 -> {
                     studentManager.saveStudents("StudentProfile.txt");
                     System.out.println("Exiting...");
