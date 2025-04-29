@@ -25,7 +25,8 @@ class Main {
             System.out.println("3. Change Student Details");
             System.out.println("4. Show Student Details");
             System.out.println("5. Show Course Details");
-            System.out.println("6. Exit");
+            System.out.println("6. Change Person Details");
+            System.out.println("7. Exit");
             System.out.print("Choose an option: ");
 
             int choice;
@@ -33,7 +34,7 @@ class Main {
                 choice = scanner.nextInt();
                 scanner.nextLine(); // Consume newline
             } catch (InputMismatchException e) {
-                System.out.println("Invalid input. Please enter a number between 1 and 6.");
+                System.out.println("Invalid input. Please enter a number between 1 and 7.");
                 scanner.nextLine(); // Consume invalid input
                 continue;
             }
@@ -44,13 +45,14 @@ class Main {
                 case 3 -> changeStudentDetails(scanner);
                 case 4 -> showStudentDetails(scanner);
                 case 5 -> showCourseDetails(scanner, students);
-                case 6 -> {
+                case 6 -> updatePersonInfo(scanner);
+                case 7 -> {
                     studentManager.saveStudents("StudentProfile.txt");
                     System.out.println("Exiting...");
                     scanner.close();
                     return;
                 }
-                default -> System.out.println("Invalid option. Please choose a number between 1 and 6.");
+                default -> System.out.println("Invalid option. Please choose a number between 1 and 7.");
             }
         }
     }
@@ -238,5 +240,51 @@ class Main {
                 System.out.println("No teacher found for this course.");
             }
         }
+    }
+    
+    static void updatePersonInfo(Scanner scanner) {
+        System.out.println("\nUpdate Person Information");
+        System.out.print("Enter S for Student or T for Teacher: ");
+        String type = scanner.nextLine().toUpperCase();
+        
+        System.out.print("Enter ID: ");
+        String id = scanner.nextLine();
+        
+        Person person = null;
+        boolean isTeacher = false;
+        
+        // Get the correct Person object based on type
+        if (type.equals("S")) {
+            person = studentManager.findStudentById(id);
+        } 
+        else if (type.equals("T")) {
+            for (Teacher teacher : teacherManager.getTeachers()) {
+                if (teacher.getId().equals(id)) {
+                    person = teacher;
+                    isTeacher = true;
+                    break;
+                }
+            }
+        }
+        
+        if (person == null) {
+            System.out.println("Person not found.");
+            return;
+        }
+        
+        System.out.print("Enter new name: ");
+        String newName = scanner.nextLine();
+        person.setName(newName);
+        
+        // Save the changes
+        try {
+            if (isTeacher) {
+                teacherManager.saveTeachers("Teachers.txt");
+            } else {
+                // Student changes will be saved when the program exits
+                System.out.println("Student change will be saved when exiting the program.");
+            }
+            System.out.println("Name updated successfully.");
+        } catch (IOException e) {}
     }
 }

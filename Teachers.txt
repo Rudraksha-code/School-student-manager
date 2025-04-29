@@ -1,7 +1,7 @@
-ID: T001, Name: Mr. Smith, DOB: 1975-03-15, Courses: Math, Physics
+ID: T001, Name: Mr. Trup, DOB: 1975-03-15, Courses: Math, Physics
 ID: T002, Name: Dr. White, DOB: 1970-02-25, Courses: Physics, Math
 ID: T003, Name: Ms. Johnson, DOB: 1980-07-22, Courses: Civics, History
-ID: T004, Name: Mr. Roy, DOB: 1988-08-18, Courses: History, Civics
+ID: T004, Name: Mr. Mustard, DOB: 1988-08-18, Courses: History, Civics
 ID: T005, Name: Dr. Brown, DOB: 1968-11-05, Courses: Chemistry, Biology
 ID: T006, Name: Ms. Taylor, DOB: 1983-06-12, Courses: Biology, Chemistry
 ID: T007, Name: Mrs. Davis, DOB: 1985-01-10, Courses: English, French

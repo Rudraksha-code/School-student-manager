@@ -27,4 +27,17 @@ class TeacherManager {
             teachers.add(new Teacher(id, name, dob, courses));
         }
     }
+    
+    void saveTeachers(String filePath) throws IOException {
+        List<String> teacherLines = new ArrayList<>();
+        for (Teacher teacher : teachers) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("ID: ").append(teacher.getId()).append(", ");
+            sb.append("Name: ").append(teacher.getName()).append(", ");
+            sb.append("DOB: ").append(teacher.getDob()).append(", ");
+            sb.append("Courses: ").append(String.join(", ", teacher.getCourses()));
+            teacherLines.add(sb.toString());
+        }
+        Utils.writeLinesToFile(filePath, teacherLines);
+    }
 }

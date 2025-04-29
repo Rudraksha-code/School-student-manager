@@ -52,7 +52,6 @@ class Student extends Person {
 
             students.add(new Student(id, name, dob, marks, attendance));
         }
-
         return students;
     }
 }
