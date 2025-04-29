@@ -2,8 +2,6 @@ import java.io.IOException;
 import java.util.*;
 
 class Main {
-    static ArrayList<Student> students = new ArrayList<>();
-
     static TeacherManager teacherManager = new TeacherManager();
     static CourseManager courseManager;
     static StudentManager studentManager;
@@ -14,8 +12,8 @@ class Main {
         courseManager = new CourseManager(new ArrayList<>());
         courseManager.initializeCourses(teacherManager.getTeachers());
         
-        students = Student.loadStudents("StudentProfile.txt", courseManager);
-        studentManager = new StudentManager(students, courseManager);
+        studentManager = new StudentManager(courseManager);
+        studentManager.loadStudents("StudentProfile.txt");
 
         Scanner scanner = new Scanner(System.in);
         while (true) {
@@ -44,7 +42,7 @@ class Main {
                 case 2 -> removeStudent(scanner);
                 case 3 -> changeStudentDetails(scanner);
                 case 4 -> showStudentDetails(scanner);
-                case 5 -> showCourseDetails(scanner, students);
+                case 5 -> showCourseDetails(scanner);
                 case 6 -> updatePersonInfo(scanner);
                 case 7 -> {
                     studentManager.saveStudents("StudentProfile.txt");
@@ -66,7 +64,7 @@ class Main {
         
         // Extract student IDs into a separate list
         ArrayList<String> studentIds = new ArrayList<>();
-        for (Student student : students) {
+        for (Student student : studentManager.getStudents()) {
             studentIds.add(student.getId());
         }
 
@@ -199,7 +197,7 @@ class Main {
         }
     }
     
-    static void showCourseDetails(Scanner scanner, ArrayList<Student> students) {
+    static void showCourseDetails(Scanner scanner) {
         // Display course details
         for (Course course : courseManager.getCourses()) {
             System.out.println("Course: " + course.getName());
@@ -210,7 +208,7 @@ class Main {
             
             int courseIndex = courseManager.getCourseIndex(course.getName());
             if (courseIndex != -1) {
-                for (Student student : students) {
+                for (Student student : studentManager.getStudents()) {
                     if (student.getMarks().get(courseIndex) != -1 && student.getAttendance().get(courseIndex) != -1) {
                         System.out.println("    - " + student.getName() + " (ID: " + student.getId() + ")");
                     }

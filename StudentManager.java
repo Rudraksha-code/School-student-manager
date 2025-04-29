@@ -6,9 +6,34 @@ class StudentManager {
     private ArrayList<Student> students;
     private CourseManager courseManager;
 
-    StudentManager(ArrayList<Student> students, CourseManager courseManager) {
-        this.students = students;
+    StudentManager(CourseManager courseManager) {
+        this.students = new ArrayList<>();
         this.courseManager = courseManager;
+    }
+
+    ArrayList<Student> getStudents() {
+        return students;
+    }
+
+    void loadStudents(String filePath) throws IOException {
+        List<String> studentLines = Utils.readLinesFromFile(filePath);
+
+        for (String line : studentLines) {
+            String[] parts = line.split(", ", 5);
+            if (parts.length < 5) {
+                System.out.println("Invalid student data: " + line);
+                continue;
+            }
+
+            String id = parts[0].split(": ")[1];
+            String name = parts[1].split(": ")[1];
+            String dob = parts[2].split(": ")[1];
+
+            ArrayList<Integer> marks = Utils.parseDetails(parts[3].split(": ")[1], courseManager);
+            ArrayList<Integer> attendance = Utils.parseDetails(parts[4].split(": ")[1], courseManager);
+
+            students.add(new Student(id, name, dob, marks, attendance));
+        }
     }
 
     void addStudent(String id, String name, String dob, ArrayList<Integer> marks, ArrayList<Integer> attendance, String[] selectedCourses) {
