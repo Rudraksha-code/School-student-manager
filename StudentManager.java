@@ -21,7 +21,7 @@ class StudentManager {
         for (String line : studentLines) {
             String[] parts = line.split(", ", 5);
             if (parts.length < 5) {
-                System.out.println("Invalid student data: " + line);
+                System.err.println("Invalid student data: " + line);
                 continue;
             }
 
@@ -49,10 +49,10 @@ class StudentManager {
                     attendance.set(courseIndex, 0); // Initialize attendance to 0
                     enrolledCourses.add(course.getName() + " (Semester " + course.getSemester() + ", Period " + course.getPeriod() + ")");
                 } else {
-                    System.out.println("Invalid course number: " + (courseIndex + 1));
+                    System.err.println("Invalid course number: " + (courseIndex + 1));
                 }
             } catch (NumberFormatException e) {
-                System.out.println("Invalid input: " + courseIndexStr);
+                System.err.println("Invalid input: " + courseIndexStr);
             }
         }
 

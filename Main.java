@@ -2,17 +2,16 @@ import java.io.IOException;
 import java.util.*;
 
 class Main {
-    static TeacherManager teacherManager = new TeacherManager();
-    static CourseManager courseManager;
-    static StudentManager studentManager;
+    
 
     public static void main(String[] args) throws IOException {
+    
+        TeacherManager teacherManager = new TeacherManager();
+        CourseManager courseManager = new CourseManager(new ArrayList<>());;
+        StudentManager studentManager = new StudentManager(courseManager);;
+    
         teacherManager.initializeTeachers("Teachers.txt");
-        
-        courseManager = new CourseManager(new ArrayList<>());
         courseManager.initializeCourses(teacherManager.getTeachers());
-        
-        studentManager = new StudentManager(courseManager);
         studentManager.loadStudents("StudentProfile.txt");
 
         Scanner scanner = new Scanner(System.in);
@@ -38,12 +37,12 @@ class Main {
             }
 
             switch (choice) {
-                case 1 -> addStudent(scanner);
-                case 2 -> removeStudent(scanner);
-                case 3 -> changeStudentDetails(scanner);
-                case 4 -> showStudentDetails(scanner);
-                case 5 -> showCourseDetails(scanner);
-                case 6 -> updatePersonInfo(scanner);
+                case 1 -> addStudent(scanner, studentManager, courseManager);
+                case 2 -> removeStudent(scanner, studentManager);
+                case 3 -> changeStudentDetails(scanner, studentManager, courseManager);
+                case 4 -> showStudentDetails(scanner, studentManager, courseManager);
+                case 5 -> showCourseDetails(scanner, courseManager, studentManager, teacherManager);
+                case 6 -> updatePersonInfo(scanner, studentManager, teacherManager);
                 case 7 -> {
                     studentManager.saveStudents("StudentProfile.txt");
                     System.out.println("Exiting...");
@@ -55,7 +54,7 @@ class Main {
         }
     }
 
-    static void addStudent(Scanner scanner) {
+    static void addStudent(Scanner scanner, StudentManager studentManager, CourseManager courseManager) {
         System.out.print("Enter name: ");
         String name = scanner.nextLine();
     
@@ -108,7 +107,7 @@ class Main {
         System.out.println("Student added successfully.");
     }
 
-    static void removeStudent(Scanner scanner) {
+    static void removeStudent(Scanner scanner, StudentManager studentManager) {
         System.out.print("Enter Student ID to remove: ");
         String id = scanner.nextLine();
 
@@ -122,7 +121,7 @@ class Main {
         }
     }
     
-    static void changeStudentDetails(Scanner scanner) {
+    static void changeStudentDetails(Scanner scanner, StudentManager studentManager, CourseManager courseManager) {
         System.out.print("Enter Student ID: ");
         String id = scanner.nextLine();
         
@@ -174,7 +173,7 @@ class Main {
         System.out.println("Student details updated successfully.");
     }
     
-    static void showStudentDetails(Scanner scanner) {
+    static void showStudentDetails(Scanner scanner, StudentManager studentManager, CourseManager courseManager) {
         System.out.print("Enter Student ID: ");
         String id = scanner.nextLine();
         
@@ -197,7 +196,7 @@ class Main {
         }
     }
     
-    static void showCourseDetails(Scanner scanner) {
+    static void showCourseDetails(Scanner scanner, CourseManager courseManager, StudentManager studentManager, TeacherManager teacherManager) {
         // Display course details
         for (Course course : courseManager.getCourses()) {
             System.out.println("Course: " + course.getName());
@@ -216,17 +215,17 @@ class Main {
             }
             System.out.println();
         }
-        viewTeacherDetail(scanner);
+        viewTeacherDetail(scanner, courseManager, teacherManager);
     }
 
-    static void viewTeacherDetail(Scanner scanner) {
+    static void viewTeacherDetail(Scanner scanner, CourseManager courseManager, TeacherManager teacherManager) {
         System.out.print("\nWould you like to view the teacher's details for a specific course? (yes/no): ");
         String response = scanner.nextLine().trim().toLowerCase();
         if (response.equals("yes")) {
             System.out.print("Enter the name of the course: ");
             String courseName = scanner.nextLine().trim();
             
-            Teacher teacher = Teacher.showTeacherDetails(teacherManager.getTeachers(), courseManager.getCourses(), courseName);
+            Teacher teacher = TeacherManager.showTeacherDetails(teacherManager.getTeachers(), courseManager.getCourses(), courseName);
 
             if (teacher != null) {
                 System.out.println("Teacher Details:");
@@ -240,7 +239,7 @@ class Main {
         }
     }
     
-    static void updatePersonInfo(Scanner scanner) {
+    static void updatePersonInfo(Scanner scanner, StudentManager studentManager, TeacherManager teacherManager) {
         System.out.println("\nUpdate Person Information");
         System.out.print("Enter S for Student or T for Teacher: ");
         String type = scanner.nextLine().toUpperCase();
