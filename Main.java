@@ -20,7 +20,7 @@ class Main {
             System.out.println("\nStudent Management System");
             System.out.println("1. Add Student");
             System.out.println("2. Remove Student");
-            System.out.println("3. Change Student Details");
+            System.out.println("3. Change Student's Course Details");
             System.out.println("4. Show Student Details");
             System.out.println("5. Show Course Details");
             System.out.println("6. Change Person Details");
@@ -277,7 +277,7 @@ class Main {
         // Save the changes
         try {
             if (isTeacher) {
-                teacherManager.saveTeachers("Teachers.txt");
+                teacherManager.saveTeachers();
             } else {
                 // Student changes will be saved when the program exits
                 System.out.println("Student change will be saved when exiting the program.");

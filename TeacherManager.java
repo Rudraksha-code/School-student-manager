@@ -28,7 +28,7 @@ class TeacherManager {
         }
     }
     
-    void saveTeachers(String filePath) throws IOException {
+    void saveTeachers() throws IOException {
         List<String> teacherLines = new ArrayList<>();
         for (Teacher teacher : teachers) {
             StringBuilder sb = new StringBuilder();
@@ -38,6 +38,6 @@ class TeacherManager {
             sb.append("Courses: ").append(String.join(", ", teacher.getCourses()));
             teacherLines.add(sb.toString());
         }
-        Utils.writeLinesToFile(filePath, teacherLines);
+        Utils.writeLinesToFile("Teachers.txt", teacherLines);
     }
 }
